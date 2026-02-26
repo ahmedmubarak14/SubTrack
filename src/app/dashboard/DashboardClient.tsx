@@ -184,7 +184,7 @@ export default function DashboardClient({ profile, subscriptions, expenses }: Pr
                                     <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                                     <XAxis dataKey="month" tick={{ fontSize: 12, fill: 'var(--color-text-tertiary)' }} axisLine={false} tickLine={false} />
                                     <YAxis tick={{ fontSize: 12, fill: 'var(--color-text-tertiary)' }} axisLine={false} tickLine={false} tickFormatter={v => `$${v}`} />
-                                    <Tooltip formatter={(v: number | undefined) => v !== undefined ? [`$${v.toFixed(0)}`, 'Spend'] : ['$0', 'Spend']} contentStyle={{ borderRadius: '10px', border: '1.5px solid var(--color-border)', fontSize: 13 }} />
+                                    <Tooltip formatter={(v: any) => [`$${Number(v).toFixed(0)}`, 'Spend']} contentStyle={{ borderRadius: '10px', border: '1.5px solid var(--color-border)', fontSize: 13 }} />
                                     <Area type="monotone" dataKey="spend" stroke="#864DB3" strokeWidth={2.5} fill="url(#spendGrad)" dot={false} activeDot={{ r: 5, fill: '#864DB3' }} />
                                 </AreaChart>
                             </ResponsiveContainer>
@@ -209,7 +209,7 @@ export default function DashboardClient({ profile, subscriptions, expenses }: Pr
                                             <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                                         ))}
                                     </Pie>
-                                    <Tooltip formatter={(v: number | undefined) => v !== undefined ? [`$${v}`, 'Monthly'] : ['$0', 'Monthly']} contentStyle={{ borderRadius: '10px', border: '1.5px solid var(--color-border)', fontSize: 13 }} />
+                                    <Tooltip formatter={(v: any) => [`$${v}`, 'Monthly']} contentStyle={{ borderRadius: '10px', border: '1.5px solid var(--color-border)', fontSize: 13 }} />
                                     <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
                                 </PieChart>
                             </ResponsiveContainer>
