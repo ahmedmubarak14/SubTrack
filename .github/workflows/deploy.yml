@@ -31,10 +31,14 @@ jobs:
         run: npm ci
 
       - name: Build static export
-        run: npm run build
+        run: npm run build 2>&1 | tee build.log; exit ${PIPESTATUS[0]}
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+      - name: Show build log on failure
+        if: failure()
+        run: cat build.log | tail -80
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
