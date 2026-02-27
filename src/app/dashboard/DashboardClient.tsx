@@ -15,6 +15,8 @@ import Link from 'next/link';
 import type { Subscription, Expense, Profile } from '@/types';
 import { CURRENCIES } from '@/types';
 import styles from './dashboard.module.css';
+import Topbar from '@/components/Topbar';
+import { useNotifications } from '@/components/NotificationsContext';
 
 interface Props {
     profile: Profile | null;
@@ -51,6 +53,7 @@ function getDaysUntilRenewal(renewalDate: string) {
 }
 
 export default function DashboardClient({ profile, subscriptions, expenses }: Props) {
+    const { openPanel } = useNotifications();
     const activeSubs = subscriptions.filter(s => s.status !== 'cancelled');
 
     // Stat calculations
@@ -103,15 +106,11 @@ export default function DashboardClient({ profile, subscriptions, expenses }: Pr
 
     return (
         <div>
-            {/* Topbar */}
-            <div className="topbar">
-                <span className="topbar-title">Dashboard</span>
-                <div className="topbar-actions">
-                    <Link href="/dashboard/subscriptions" className="btn btn-primary btn-sm">
-                        + Add Subscription
-                    </Link>
-                </div>
-            </div>
+            <Topbar title="Dashboard" onToggleNotifications={openPanel}>
+                <Link href="/dashboard/subscriptions" className="btn btn-primary btn-sm">
+                    + Add Subscription
+                </Link>
+            </Topbar>
 
             <div className="page-content">
                 {/* Welcome */}

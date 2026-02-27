@@ -73,19 +73,6 @@ export default function Sidebar({ profile, onToggleNotifications }: SidebarProps
                     <Settings size={18} />
                     {t('nav_settings')}
                 </Link>
-                <div
-                    className={`sidebar-link ${pathname.startsWith('/dashboard/notifications') ? 'active' : ''}`}
-                    onClick={onToggleNotifications}
-                    style={{ cursor: 'pointer' }}
-                >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Bell size={18} />
-                            {t('nav_notifications')}
-                        </div>
-                        <div style={{ background: 'var(--color-accent)', width: 6, height: 6, borderRadius: '50%' }} />
-                    </div>
-                </div>
             </div>
 
             {/* Language Toggle */}

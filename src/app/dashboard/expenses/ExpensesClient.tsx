@@ -6,6 +6,8 @@ import { Search, Plus, Trash2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import type { Profile } from '@/types';
 import { CURRENCIES, EXPENSE_CATEGORIES } from '@/types';
+import Topbar from '@/components/Topbar';
+import { useNotifications } from '@/components/NotificationsContext';
 
 interface Expense {
     id: string;
@@ -32,6 +34,7 @@ function formatCurrency(amount: number, currency = 'USD') {
 }
 
 export default function ExpensesClient({ expenses: initialExpenses, orgId, profile }: Props) {
+    const { openPanel } = useNotifications();
     const supabase = createClient();
     const [expenses, setExpenses] = useState(initialExpenses);
     const [search, setSearch] = useState('');
@@ -99,14 +102,11 @@ export default function ExpensesClient({ expenses: initialExpenses, orgId, profi
 
     return (
         <div>
-            <div className="topbar">
-                <span className="topbar-title">Expenses</span>
-                <div className="topbar-actions">
-                    <button className="btn btn-primary btn-sm" onClick={() => setShowAdd(true)}>
-                        <Plus size={14} /> Add Expense
-                    </button>
-                </div>
-            </div>
+            <Topbar title="Expenses" onToggleNotifications={openPanel}>
+                <button className="btn btn-primary btn-sm" onClick={() => setShowAdd(true)}>
+                    <Plus size={14} /> Add Expense
+                </button>
+            </Topbar>
 
             <div className="page-content">
                 {/* Summary strip */}

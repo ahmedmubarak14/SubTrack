@@ -7,10 +7,13 @@ import { Building2, Globe, Bell, LogOut, Lock, User } from 'lucide-react';
 import type { Profile } from '@/types';
 import { CURRENCIES } from '@/types';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import Topbar from '@/components/Topbar';
+import { useNotifications } from '@/components/NotificationsContext';
 
 interface Props { profile: Profile | null; orgName: string; orgId: string | null; }
 
 export default function SettingsClient({ profile, orgName, orgId }: Props) {
+    const { openPanel } = useNotifications();
     const supabase = createClient();
     const router = useRouter();
     const { t } = useLanguage();
@@ -91,12 +94,9 @@ export default function SettingsClient({ profile, orgName, orgId }: Props) {
 
     return (
         <div>
-            <div className="topbar">
-                <span className="topbar-title">{t('settings_title')}</span>
-                <div className="topbar-actions">
-                    {saved && <span className="badge badge-green">{t('settings_saved')}</span>}
-                </div>
-            </div>
+            <Topbar title={t('settings_title')} onToggleNotifications={openPanel}>
+                {saved && <span className="badge badge-green">{t('settings_saved')}</span>}
+            </Topbar>
 
             <div className="page-content" style={{ maxWidth: 640 }}>
                 {error && (

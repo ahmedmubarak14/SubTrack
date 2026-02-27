@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Users, Shield, Eye, BarChart2, X, Mail, TrendingUp } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import type { Profile, Subscription } from '@/types';
+import Topbar from '@/components/Topbar';
+import { useNotifications } from '@/components/NotificationsContext';
 
 interface Props {
     members: Profile[];
@@ -13,6 +15,7 @@ interface Props {
 }
 
 export default function TeamClient({ members, subscriptions, currentProfile, orgId }: Props) {
+    const { openPanel } = useNotifications();
     const { t } = useLanguage();
     const [showInvite, setShowInvite] = useState(false);
     const [inviteEmail, setInviteEmail] = useState('');
@@ -76,16 +79,13 @@ export default function TeamClient({ members, subscriptions, currentProfile, org
 
     return (
         <div>
-            <div className="topbar">
-                <span className="topbar-title">{t('team_title')}</span>
+            <Topbar title={t('team_title')} onToggleNotifications={openPanel}>
                 {isAdmin && (
-                    <div className="topbar-actions">
-                        <button className="btn btn-primary" onClick={() => setShowInvite(true)}>
-                            <Users size={16} /> {t('team_invite')}
-                        </button>
-                    </div>
+                    <button className="btn btn-primary" onClick={() => setShowInvite(true)}>
+                        <Users size={16} /> {t('team_invite')}
+                    </button>
                 )}
-            </div>
+            </Topbar>
 
             <div className="page-content">
                 {/* Stats strip */}

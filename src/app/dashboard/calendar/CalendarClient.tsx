@@ -2,9 +2,11 @@
 
 import { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, isToday, parseISO } from 'date-fns';
-import { ChevronLeft, ChevronRight, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 import Link from 'next/link';
 import { CURRENCIES } from '@/types';
+import Topbar from '@/components/Topbar';
+import { useNotifications } from '@/components/NotificationsContext';
 
 interface Sub {
     id: string;
@@ -29,6 +31,7 @@ function formatCurrency(amount: number, currency = 'USD') {
 }
 
 export default function CalendarClient({ subscriptions }: { subscriptions: Sub[] }) {
+    const { openPanel } = useNotifications();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selected, setSelected] = useState<Sub | null>(null);
 
@@ -59,16 +62,13 @@ export default function CalendarClient({ subscriptions }: { subscriptions: Sub[]
 
     return (
         <div>
-            <div className="topbar">
-                <span className="topbar-title">Renewal Calendar</span>
-                <div className="topbar-actions">
-                    <button className="btn btn-secondary btn-sm" onClick={prevMonth}><ChevronLeft size={14} /></button>
-                    <span style={{ fontSize: '14px', fontWeight: 700, minWidth: 130, textAlign: 'center' }}>
-                        {format(currentDate, 'MMMM yyyy')}
-                    </span>
-                    <button className="btn btn-secondary btn-sm" onClick={nextMonth}><ChevronRight size={14} /></button>
-                </div>
-            </div>
+            <Topbar title="Renewal Calendar" onToggleNotifications={openPanel}>
+                <button className="btn btn-secondary btn-sm" onClick={prevMonth}>{/* Note: Arrow Left */}<span style={{ fontSize: 14 }}>←</span></button>
+                <span style={{ fontSize: '14px', fontWeight: 700, minWidth: 130, textAlign: 'center' }}>
+                    {format(currentDate, 'MMMM yyyy')}
+                </span>
+                <button className="btn btn-secondary btn-sm" onClick={nextMonth}>{/* Note: Arrow Right */}<span style={{ fontSize: 14 }}>→</span></button>
+            </Topbar>
 
             <div className="page-content">
                 {/* Legend */}

@@ -4,19 +4,19 @@ import { useState } from 'react';
 import { Keyboard, UploadCloud, Landmark, ChevronLeft, Download } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Topbar from '@/components/Topbar';
+import { useNotifications } from '@/components/NotificationsContext';
 
 export default function ImportSubscriptionsPage() {
+    const { openPanel } = useNotifications();
     const router = useRouter();
     const [selectedMethod, setSelectedMethod] = useState<'manual' | 'upload' | 'bank' | null>(null);
 
     return (
         <div>
-            <div className="topbar">
-                <span className="topbar-title">Onboarding</span>
-                <div className="topbar-actions">
-                    <button className="btn btn-secondary btn-sm" onClick={() => router.push('/dashboard')}>Save & Exit</button>
-                </div>
-            </div>
+            <Topbar title="Onboarding" onToggleNotifications={openPanel}>
+                <button className="btn btn-secondary btn-sm" onClick={() => router.push('/dashboard')}>Save & Exit</button>
+            </Topbar>
 
             <div className="page-content" style={{ display: 'flex', justifyContent: 'center', paddingTop: 'var(--space-8)' }}>
                 <div className="card" style={{ maxWidth: 800, width: '100%', padding: 'var(--space-8)' }}>

@@ -6,8 +6,11 @@ import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { differenceInDays, format } from 'date-fns';
 import { ArrowLeft, Edit2, Calendar, Users, DollarSign, Tag } from 'lucide-react';
+import Topbar from '@/components/Topbar';
+import { useNotifications } from '@/components/NotificationsContext';
 
 function SubscriptionDetail() {
+    const { openPanel } = useNotifications();
     const searchParams = useSearchParams();
     const id = searchParams.get('id');
     const [sub, setSub] = useState<any | null | 'not-found'>('loading');
@@ -31,22 +34,20 @@ function SubscriptionDetail() {
 
     return (
         <div>
-            <div className="topbar">
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <Link href="/dashboard/subscriptions" className="btn btn-ghost" style={{ padding: '6px 10px' }}>
-                        <ArrowLeft size={16} />
-                    </Link>
-                    <span className="topbar-title">{sub.name}</span>
-                    <span style={{ padding: '2px 10px', borderRadius: 6, background: `${STATUS_COLORS[sub.status]}20`, color: STATUS_COLORS[sub.status], fontSize: 12, fontWeight: 700, textTransform: 'capitalize' }}>
-                        {sub.status}
-                    </span>
-                </div>
-                <div className="topbar-actions">
-                    <Link href={`/dashboard/subscriptions/edit?id=${id}`} className="btn btn-primary">
-                        <Edit2 size={15} /> Edit
-                    </Link>
-                </div>
-            </div>
+            <Topbar
+                title={sub.name}
+                onToggleNotifications={openPanel}
+            >
+                <Link href="/dashboard/subscriptions" className="btn btn-ghost" style={{ padding: '6px 10px', order: -1 }}>
+                    <ArrowLeft size={16} />
+                </Link>
+                <span style={{ padding: '2px 10px', borderRadius: 6, background: `${STATUS_COLORS[sub.status]}20`, color: STATUS_COLORS[sub.status], fontSize: 12, fontWeight: 700, textTransform: 'capitalize' }}>
+                    {sub.status}
+                </span>
+                <Link href={`/dashboard/subscriptions/edit?id=${id}`} className="btn btn-primary" style={{ marginLeft: 'auto' }}>
+                    <Edit2 size={15} /> Edit
+                </Link>
+            </Topbar>
 
             <div className="page-content" style={{ maxWidth: 700 }}>
                 <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 'var(--space-5)' }}>

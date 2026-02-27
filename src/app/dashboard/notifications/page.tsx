@@ -3,8 +3,11 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { Bell, CheckCircle2 } from 'lucide-react';
+import Topbar from '@/components/Topbar';
+import { useNotifications } from '@/components/NotificationsContext';
 
 export default function NotificationsPage() {
+    const { openPanel } = useNotifications();
     const [notifications, setNotifications] = useState<any[] | null>(null);
 
     useEffect(() => {
@@ -28,9 +31,7 @@ export default function NotificationsPage() {
 
     return (
         <div>
-            <div className="topbar">
-                <span className="topbar-title">Notifications</span>
-            </div>
+            <Topbar title="Notifications" onToggleNotifications={openPanel} />
             <div className="page-content" style={{ maxWidth: 640 }}>
                 {notifications.length === 0 ? (
                     <div className="empty-state">

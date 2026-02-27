@@ -10,6 +10,8 @@ import AddSubscriptionModal from './AddSubscriptionModal';
 import type { Subscription, Profile } from '@/types';
 import { CURRENCIES } from '@/types';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import Topbar from '@/components/Topbar';
+import { useNotifications } from '@/components/NotificationsContext';
 
 interface Props {
     subscriptions: Subscription[];
@@ -39,6 +41,7 @@ type SortKey = 'name' | 'cost' | 'renewal_date' | 'seats' | 'status';
 type SortDir = 'asc' | 'desc';
 
 export default function SubscriptionsClient({ subscriptions: initialSubs, teamMembers, currentProfile, orgId }: Props) {
+    const { openPanel } = useNotifications();
     const router = useRouter();
     const supabase = createClient();
     const { t } = useLanguage();
@@ -132,18 +135,14 @@ export default function SubscriptionsClient({ subscriptions: initialSubs, teamMe
 
     return (
         <div>
-            {/* Topbar */}
-            <div className="topbar">
-                <span className="topbar-title">{t('subs_title')}</span>
-                <div className="topbar-actions">
-                    <button className="btn btn-secondary btn-sm" onClick={exportCSV}>
-                        <Download size={14} /> {t('subs_import_csv').replace('Import', 'Export')}
-                    </button>
-                    <button className="btn btn-primary btn-sm" onClick={() => setShowAdd(true)}>
-                        <Plus size={14} /> {t('subs_add')}
-                    </button>
-                </div>
-            </div>
+            <Topbar title={t('subs_title')} onToggleNotifications={openPanel}>
+                <button className="btn btn-secondary btn-sm" onClick={exportCSV}>
+                    <Download size={14} /> {t('subs_import_csv').replace('Import', 'Export')}
+                </button>
+                <button className="btn btn-primary btn-sm" onClick={() => setShowAdd(true)}>
+                    <Plus size={14} /> {t('subs_add')}
+                </button>
+            </Topbar>
 
             <div className="page-content">
                 {/* Summary strip */}
