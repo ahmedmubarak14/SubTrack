@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { Search, Plus, Users, ChevronUp, ChevronDown, Edit2, Trash2, Download } from 'lucide-react';
 import Link from 'next/link';
@@ -53,6 +53,16 @@ export default function SubscriptionsClient({ subscriptions: initialSubs, teamMe
     const [editSub, setEditSub] = useState<Subscription | null>(null);
     const [deleting, setDeleting] = useState<string | null>(null);
     const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+    // Exchange rates relative to USD (SAR is pegged at 3.75)
+    const [rates, setRates] = useState<Record<string, number>>({ USD: 1, SAR: 3.75, EUR: 0.92, GBP: 0.79 });
+
+    // Fetch live exchange rates
+    useEffect(() => {
+        fetch('https://open.er-api.com/v6/latest/USD')
+            .then(r => r.json())
+            .then(d => { if (d.rates) setRates(d.rates); })
+            .catch(() => { }); // silently fall back to defaults
+    }, []);
 
     const toggleSort = (key: SortKey) => {
         if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
@@ -85,12 +95,18 @@ export default function SubscriptionsClient({ subscriptions: initialSubs, teamMe
 
     const totalMonthly = useMemo(() => {
         return subscriptions.filter(s => s.status !== 'cancelled').reduce((sum, s) => {
-            if (s.billing_cycle === 'monthly') return sum + s.cost;
-            if (s.billing_cycle === 'yearly') return sum + s.cost / 12;
-            if (s.billing_cycle === 'quarterly') return sum + s.cost / 3;
-            return sum;
-        }, 0);
-    }, [subscriptions]);
+            // Normalize each sub to USD first using live rates
+            const toUsd = 1 / (rates[s.currency] ?? 1);
+            const monthly = s.billing_cycle === 'monthly' ? s.cost
+                : s.billing_cycle === 'yearly' ? s.cost / 12
+                    : s.billing_cycle === 'quarterly' ? s.cost / 3
+                        : 0;
+            return sum + monthly * toUsd;
+        }, 0); // result in USD
+    }, [subscriptions, rates]);
+
+    const totalMonthlyUSD = totalMonthly;
+    const totalMonthlySAR = totalMonthly * (rates['SAR'] ?? 3.75);
 
     const handleDelete = async (id: string) => {
         setDeleting(id);
@@ -132,8 +148,13 @@ export default function SubscriptionsClient({ subscriptions: initialSubs, teamMe
             <div className="page-content">
                 {/* Summary strip */}
                 <div style={{ display: 'flex', gap: 'var(--space-4)', marginBottom: 'var(--space-6)', flexWrap: 'wrap' }}>
+                    {/* Total Monthly — dual currency card */}
+                    <div style={{ background: 'var(--color-bg-secondary)', border: '1.5px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: '10px 18px', display: 'flex', flexDirection: 'column', minWidth: 160 }}>
+                        <span style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Monthly</span>
+                        <span style={{ fontSize: 'var(--font-size-xl)', fontWeight: 800, color: 'var(--color-purple)' }}>${totalMonthlyUSD.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+                        <span style={{ fontSize: '12px', color: 'var(--color-text-tertiary)', fontWeight: 600, marginTop: 1 }}>﷼ {totalMonthlySAR.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} SAR</span>
+                    </div>
                     {[
-                        { label: 'Total Monthly', value: formatCurrency(totalMonthly), color: 'var(--color-purple)' },
                         { label: 'Active', value: subscriptions.filter(s => s.status === 'active').length, color: 'var(--color-green)' },
                         { label: 'Expiring', value: subscriptions.filter(s => s.status === 'expiring').length, color: 'var(--color-orange)' },
                         { label: 'Trial', value: subscriptions.filter(s => s.status === 'trial').length, color: 'var(--color-blue)' },

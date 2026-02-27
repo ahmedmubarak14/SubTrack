@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { X, Search, ChevronLeft } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { X, Search, ChevronLeft, Users, DollarSign, Info } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { SUBSCRIPTION_CATEGORIES, CURRENCIES } from '@/types';
 import { APP_CATALOG, getLogoUrl, AppEntry } from '@/lib/appCatalog';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import type { Subscription, Profile } from '@/types';
+import { addMonths, addYears, addDays, format } from 'date-fns';
 
 interface Props {
     onClose: () => void;
@@ -17,6 +18,22 @@ interface Props {
 }
 
 const BILLING_CYCLES = ['monthly', 'yearly', 'quarterly', 'one-time'] as const;
+
+/** Auto-calculate renewal date from start date + billing cycle */
+function calcRenewalDate(startDate: string, billingCycle: string): string {
+    if (!startDate) return '';
+    const d = new Date(startDate);
+    if (isNaN(d.getTime())) return '';
+    let next: Date;
+    switch (billingCycle) {
+        case 'monthly': next = addMonths(d, 1); break;
+        case 'yearly': next = addYears(d, 1); break;
+        case 'quarterly': next = addMonths(d, 3); break;
+        case 'one-time': next = addDays(d, 1); break;
+        default: next = addMonths(d, 1);
+    }
+    return format(next, 'yyyy-MM-dd');
+}
 
 function AppLogo({ domain, name }: { domain: string; name: string }) {
     const [failed, setFailed] = useState(false);
@@ -50,24 +67,52 @@ export default function AddSubscriptionModal({ onClose, subscription, teamMember
     const [search, setSearch] = useState('');
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
+    const [renewalEdited, setRenewalEdited] = useState(isEdit); // true = user has manually set renewal
 
     const [form, setForm] = useState({
         name: subscription?.name ?? '',
         vendor: subscription?.vendor ?? '',
         domain: '',
         category: subscription?.category ?? 'Other',
-        cost: subscription?.cost?.toString() ?? '',
+        // Pricing
+        pricePerUser: '',                           // new: price per seat
+        cost: subscription?.cost?.toString() ?? '', // total cost
+        pricingMode: 'total' as 'total' | 'per_user',
         currency: subscription?.currency ?? 'USD',
         billing_cycle: subscription?.billing_cycle ?? 'monthly',
-        start_date: subscription?.start_date ?? '',
+        // Dates
+        start_date: subscription?.start_date ?? format(new Date(), 'yyyy-MM-dd'),
         renewal_date: subscription?.renewal_date ?? '',
-        seats: subscription?.seats?.toString() ?? '0',
+        seats: subscription?.seats?.toString() ?? '1',
         owner_id: subscription?.owner_id ?? '',
         status: subscription?.status ?? 'active',
         notes: subscription?.notes ?? '',
     });
 
     const set = (k: keyof typeof form, v: string) => setForm(f => ({ ...f, [k]: v }));
+
+    // Auto-calc renewal date when start_date or billing_cycle changes (unless user manually edited renewal)
+    useEffect(() => {
+        if (!renewalEdited && form.start_date) {
+            const auto = calcRenewalDate(form.start_date, form.billing_cycle);
+            if (auto) setForm(f => ({ ...f, renewal_date: auto }));
+        }
+    }, [form.start_date, form.billing_cycle, renewalEdited]);
+
+    // Auto-calc total cost when pricePerUser × seats (in per_user mode)
+    const computedTotal = useMemo(() => {
+        if (form.pricingMode !== 'per_user') return null;
+        const ppu = parseFloat(form.pricePerUser);
+        const seats = parseInt(form.seats) || 1;
+        if (isNaN(ppu) || ppu <= 0) return null;
+        return ppu * seats;
+    }, [form.pricingMode, form.pricePerUser, form.seats]);
+
+    useEffect(() => {
+        if (computedTotal !== null) {
+            setForm(f => ({ ...f, cost: computedTotal.toFixed(2) }));
+        }
+    }, [computedTotal]);
 
     const filteredApps = useMemo(() => {
         const q = search.toLowerCase();
@@ -130,9 +175,11 @@ export default function AddSubscriptionModal({ onClose, subscription, teamMember
         }
     };
 
+    const currSym = CURRENCIES.find(c => c.code === form.currency)?.symbol ?? '$';
+
     return (
         <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-            <div className="modal" style={{ maxWidth: step === 'pick' ? 700 : 560 }}>
+            <div className="modal" style={{ maxWidth: step === 'pick' ? 700 : 580 }}>
                 <div className="modal-header">
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         {step === 'form' && !isEdit && (
@@ -152,7 +199,6 @@ export default function AddSubscriptionModal({ onClose, subscription, teamMember
                     <div style={{ padding: '0 var(--space-5) var(--space-5)' }}>
                         <p style={{ color: 'var(--color-text-secondary)', fontSize: 14, marginBottom: 16 }}>{t('modal_pick_subtitle')}</p>
 
-                        {/* Search */}
                         <div style={{ position: 'relative', marginBottom: 16 }}>
                             <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-tertiary)' }} />
                             <input
@@ -165,14 +211,12 @@ export default function AddSubscriptionModal({ onClose, subscription, teamMember
                             />
                         </div>
 
-                        {/* Custom app tile */}
                         <div
                             onClick={() => handlePickApp(null)}
                             style={{
                                 display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
                                 border: '2px dashed var(--color-accent)', borderRadius: 12, cursor: 'pointer',
-                                marginBottom: 16, background: 'var(--color-purple-bg)',
-                                transition: 'all 0.15s'
+                                marginBottom: 16, background: 'var(--color-purple-bg)', transition: 'all 0.15s'
                             }}
                             onMouseOver={e => (e.currentTarget.style.borderColor = '#864DB3')}
                             onMouseOut={e => (e.currentTarget.style.borderColor = 'var(--color-accent)')}
@@ -184,7 +228,6 @@ export default function AddSubscriptionModal({ onClose, subscription, teamMember
                             </div>
                         </div>
 
-                        {/* App grid */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 8, maxHeight: 420, overflowY: 'auto' }}>
                             {filteredApps.map(app => (
                                 <div
@@ -215,7 +258,6 @@ export default function AddSubscriptionModal({ onClose, subscription, teamMember
                         <div className="modal-body">
                             {error && <div style={{ background: 'var(--color-red-bg)', color: 'var(--color-red)', borderRadius: 8, padding: '10px 14px', fontSize: 13, marginBottom: 12 }}>{error}</div>}
 
-                            {/* Show selected app logo if we have a domain */}
                             {form.domain && (
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, padding: '10px 14px', background: 'var(--color-purple-bg)', borderRadius: 10 }}>
                                     <AppLogo domain={form.domain} name={form.name} />
@@ -227,6 +269,7 @@ export default function AddSubscriptionModal({ onClose, subscription, teamMember
                             )}
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+                                {/* Name */}
                                 <div className="form-group" style={{ gridColumn: form.domain ? '1' : '1/-1' }}>
                                     <label className="form-label">{t('modal_name')}</label>
                                     <input className="form-input" placeholder={t('modal_name_ph')} value={form.name} onChange={e => set('name', e.target.value)} required />
@@ -239,6 +282,7 @@ export default function AddSubscriptionModal({ onClose, subscription, teamMember
                                     </div>
                                 )}
 
+                                {/* Category */}
                                 <div className="form-group">
                                     <label className="form-label">{t('modal_category')}</label>
                                     <select className="form-select" value={form.category} onChange={e => set('category', e.target.value)}>
@@ -246,21 +290,7 @@ export default function AddSubscriptionModal({ onClose, subscription, teamMember
                                     </select>
                                 </div>
 
-                                <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: 8 }}>
-                                    <div>
-                                        <label className="form-label">{t('modal_cost')}</label>
-                                        <div style={{ display: 'flex', gap: 6 }}>
-                                            <select className="form-select" style={{ padding: '8px 4px', minWidth: 72 }} value={form.currency} onChange={e => set('currency', e.target.value)}>
-                                                {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code}</option>)}
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="form-label">&nbsp;</label>
-                                        <input className="form-input" type="number" step="0.01" min="0" placeholder="0.00" value={form.cost} onChange={e => set('cost', e.target.value)} required />
-                                    </div>
-                                </div>
-
+                                {/* Billing Cycle */}
                                 <div className="form-group">
                                     <label className="form-label">{t('modal_billing_cycle')}</label>
                                     <select className="form-select" value={form.billing_cycle} onChange={e => set('billing_cycle', e.target.value)}>
@@ -268,22 +298,145 @@ export default function AddSubscriptionModal({ onClose, subscription, teamMember
                                     </select>
                                 </div>
 
+                                {/* ── Seats & Pricing ── */}
+                                <div className="form-group" style={{ gridColumn: '1/-1' }}>
+                                    <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Users size={14} /> Seats & Pricing</span>
+                                        {/* Toggle: total vs per-user */}
+                                        <div style={{ display: 'flex', background: 'var(--color-bg-secondary)', borderRadius: 8, padding: 3, gap: 2, fontSize: 11 }}>
+                                            {(['total', 'per_user'] as const).map(m => (
+                                                <button
+                                                    key={m}
+                                                    type="button"
+                                                    onClick={() => set('pricingMode', m)}
+                                                    style={{
+                                                        padding: '3px 10px', borderRadius: 6, border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 11,
+                                                        background: form.pricingMode === m ? 'var(--color-accent)' : 'transparent',
+                                                        color: form.pricingMode === m ? '#fff' : 'var(--color-text-secondary)',
+                                                        transition: 'all 0.15s'
+                                                    }}
+                                                >
+                                                    {m === 'total' ? 'Total Price' : 'Per User'}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </label>
+
+                                    <div style={{ display: 'grid', gridTemplateColumns: form.pricingMode === 'per_user' ? '80px 1fr 1fr' : '80px 1fr', gap: 8 }}>
+                                        {/* Currency + Seats */}
+                                        <select className="form-select" style={{ padding: '8px 4px' }} value={form.currency} onChange={e => set('currency', e.target.value)}>
+                                            {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code}</option>)}
+                                        </select>
+
+                                        {form.pricingMode === 'per_user' ? (
+                                            <>
+                                                {/* Price per user */}
+                                                <div style={{ position: 'relative' }}>
+                                                    <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-tertiary)', fontSize: 13, fontWeight: 600 }}>{currSym}</span>
+                                                    <input
+                                                        className="form-input"
+                                                        type="number" step="0.01" min="0"
+                                                        placeholder="Price / user"
+                                                        value={form.pricePerUser}
+                                                        onChange={e => set('pricePerUser', e.target.value)}
+                                                        style={{ paddingLeft: 26 }}
+                                                    />
+                                                </div>
+                                                {/* Seats */}
+                                                <div style={{ position: 'relative' }}>
+                                                    <Users size={13} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-tertiary)' }} />
+                                                    <input
+                                                        className="form-input"
+                                                        type="number" min="1"
+                                                        placeholder="Seats"
+                                                        value={form.seats}
+                                                        onChange={e => set('seats', e.target.value)}
+                                                        style={{ paddingLeft: 30 }}
+                                                    />
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <input
+                                                className="form-input"
+                                                type="number" step="0.01" min="0"
+                                                placeholder="0.00"
+                                                value={form.cost}
+                                                onChange={e => set('cost', e.target.value)}
+                                                required
+                                            />
+                                        )}
+                                    </div>
+
+                                    {/* Computed total summary */}
+                                    {form.pricingMode === 'per_user' && (
+                                        <div style={{
+                                            marginTop: 8, display: 'flex', alignItems: 'center', gap: 8,
+                                            background: computedTotal !== null ? 'var(--color-green-bg)' : 'var(--color-bg-secondary)',
+                                            borderRadius: 8, padding: '8px 12px', fontSize: 13
+                                        }}>
+                                            <DollarSign size={14} color={computedTotal !== null ? 'var(--color-green)' : 'var(--color-text-tertiary)'} />
+                                            {computedTotal !== null ? (
+                                                <span>
+                                                    <strong>{currSym}{computedTotal.toFixed(2)}</strong> total
+                                                    &nbsp;({currSym}{parseFloat(form.pricePerUser || '0').toFixed(2)} × {form.seats || 1} users/{form.billing_cycle})
+                                                </span>
+                                            ) : (
+                                                <span style={{ color: 'var(--color-text-tertiary)' }}>Enter price per user to auto-calculate total</span>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Seats input in total mode */}
+                                    {form.pricingMode === 'total' && (
+                                        <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                            <Users size={13} color="var(--color-text-tertiary)" />
+                                            <input
+                                                className="form-input"
+                                                type="number" min="0"
+                                                placeholder="Number of seats (optional)"
+                                                value={form.seats}
+                                                onChange={e => set('seats', e.target.value)}
+                                                style={{ maxWidth: 200 }}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* ── Dates ── */}
                                 <div className="form-group">
-                                    <label className="form-label">{t('modal_start_date')}</label>
-                                    <input className="form-input" type="date" value={form.start_date} onChange={e => set('start_date', e.target.value)} />
+                                    <label className="form-label">Start Date</label>
+                                    <input
+                                        className="form-input"
+                                        type="date"
+                                        value={form.start_date}
+                                        onChange={e => { set('start_date', e.target.value); setRenewalEdited(false); }}
+                                    />
                                 </div>
 
                                 <div className="form-group">
-                                    <label className="form-label">{t('modal_renewal_date')}</label>
-                                    <input className="form-input" type="date" value={form.renewal_date} onChange={e => set('renewal_date', e.target.value)} required />
+                                    <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span>Renewal Date</span>
+                                        {!renewalEdited && form.start_date && (
+                                            <span style={{ fontSize: 10, background: 'var(--color-green-bg)', color: 'var(--color-green)', padding: '1px 6px', borderRadius: 10, fontWeight: 600 }}>
+                                                Auto-calculated
+                                            </span>
+                                        )}
+                                    </label>
+                                    <input
+                                        className="form-input"
+                                        type="date"
+                                        value={form.renewal_date}
+                                        onChange={e => { set('renewal_date', e.target.value); setRenewalEdited(true); }}
+                                        required
+                                    />
+                                    {!renewalEdited && form.start_date && (
+                                        <span className="form-hint" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                            <Info size={11} /> Based on start date + {form.billing_cycle} cycle. Edit to override.
+                                        </span>
+                                    )}
                                 </div>
 
-                                <div className="form-group">
-                                    <label className="form-label">{t('modal_seats')}</label>
-                                    <input className="form-input" type="number" min="0" value={form.seats} onChange={e => set('seats', e.target.value)} />
-                                    <span className="form-hint">{t('modal_seats_hint')}</span>
-                                </div>
-
+                                {/* Owner */}
                                 <div className="form-group">
                                     <label className="form-label">{t('modal_owner')}</label>
                                     <select className="form-select" value={form.owner_id} onChange={e => set('owner_id', e.target.value)}>
@@ -292,6 +445,7 @@ export default function AddSubscriptionModal({ onClose, subscription, teamMember
                                     </select>
                                 </div>
 
+                                {/* Status */}
                                 <div className="form-group">
                                     <label className="form-label">{t('modal_status')}</label>
                                     <select className="form-select" value={form.status} onChange={e => set('status', e.target.value)}>
@@ -302,6 +456,7 @@ export default function AddSubscriptionModal({ onClose, subscription, teamMember
                                     </select>
                                 </div>
 
+                                {/* Notes */}
                                 <div className="form-group" style={{ gridColumn: '1/-1' }}>
                                     <label className="form-label">{t('modal_notes')}</label>
                                     <textarea className="form-input" rows={2} value={form.notes} onChange={e => set('notes', e.target.value)} style={{ resize: 'vertical' }} />

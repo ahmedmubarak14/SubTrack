@@ -59,6 +59,7 @@ export const APP_CATALOG: AppEntry[] = [
     { name: 'Amplitude', vendor: 'Amplitude Inc', domain: 'amplitude.com', category: 'Analytics', defaultSeats: 5 },
 
     // Productivity & Operations
+    { name: 'Google Workspace', vendor: 'Google', domain: 'workspace.google.com', category: 'Operations', defaultSeats: 10 },
     { name: 'Notion', vendor: 'Notion Labs', domain: 'notion.so', category: 'Operations', defaultSeats: 10 },
     { name: 'Confluence', vendor: 'Atlassian', domain: 'atlassian.com', category: 'Operations', defaultSeats: 10 },
     { name: 'Asana', vendor: 'Asana', domain: 'asana.com', category: 'Operations', defaultSeats: 5 },
