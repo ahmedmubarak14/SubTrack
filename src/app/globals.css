@@ -1280,15 +1280,6 @@ p {
   left: -20px;
 }
 
-/* Topbar actions — already flex, will naturally flip with dir */
-[dir="rtl"] .topbar {
-  flex-direction: row-reverse;
-}
-
-/* Filter bar — reverse direction */
-[dir="rtl"] .filter-bar {
-  flex-direction: row-reverse;
-}
 
 /* Search input icon — flip padding/icon position */
 [dir="rtl"] .search-input-wrapper input {
@@ -1341,10 +1332,6 @@ p {
   border-left: none;
 }
 
-/* Badge dot — keep it on the correct side */
-[dir="rtl"] .badge {
-  flex-direction: row-reverse;
-}
 
 /* Modal — text alignment */
 [dir="rtl"] .modal-content {

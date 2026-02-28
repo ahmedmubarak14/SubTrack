@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isToday, parseISO } from 'date-fns';
+import { ar } from 'date-fns/locale';
 import Link from 'next/link';
 import { CURRENCIES, type Subscription } from '@/types';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
@@ -30,7 +31,7 @@ interface Props {
 }
 
 export default function DashboardCalendar({ subscriptions }: Props) {
-    const { t } = useLanguage();
+    const { t, lang } = useLanguage();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -69,7 +70,7 @@ export default function DashboardCalendar({ subscriptions }: Props) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                     <button className="btn btn-secondary btn-sm" onClick={prevMonth} style={{ padding: '4px 8px' }}>←</button>
                     <span style={{ fontSize: '13px', fontWeight: 600, minWidth: 100, textAlign: 'center' }}>
-                        {format(currentDate, 'MMM yyyy')}
+                        {format(currentDate, 'MMM yyyy', { locale: lang === 'ar' ? ar : undefined })}
                     </span>
                     <button className="btn btn-secondary btn-sm" onClick={nextMonth} style={{ padding: '4px 8px' }}>→</button>
                 </div>
@@ -142,6 +143,6 @@ export default function DashboardCalendar({ subscriptions }: Props) {
                     </div>
                 ))}
             </div>
-        </div>
+        </div >
     );
 }

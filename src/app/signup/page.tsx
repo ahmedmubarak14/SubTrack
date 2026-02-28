@@ -5,8 +5,10 @@ import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, User, Building2, Zap } from 'lucide-react';
 import styles from '../login/auth.module.css';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function SignupPage() {
+    const { t, isRTL } = useLanguage();
     const router = useRouter();
     const supabase = createClient();
     const [step, setStep] = useState<'credentials' | 'org'>('credentials');
@@ -48,26 +50,26 @@ export default function SignupPage() {
     };
 
     return (
-        <div className={styles.authPage}>
+        <div className={styles.authPage} dir={isRTL ? 'rtl' : 'ltr'}>
             <div className={styles.authLeft}>
                 <div className={styles.authBrand}>
                     <img src="/SubTrack/logo-white.png" alt="Subtrack" className="sidebar-logo-img" style={{ height: 32, width: 'auto' }} />
                 </div>
                 <div className={styles.authHero}>
-                    <h1>30 seconds to set up.<br />Hours saved every month.</h1>
-                    <p>Join teams that track every subscription, every renewal, and every dollar spent on SaaS.</p>
+                    <h1 style={{ whiteSpace: 'pre-line' }}>{t('auth_hero_2_title')}</h1>
+                    <p>{t('auth_hero_2_sub')}</p>
                     <div className={styles.authStats}>
                         <div className={styles.authStat}>
-                            <span className={styles.authStatValue}>Free</span>
-                            <span className={styles.authStatLabel}>to get started</span>
+                            <span className={styles.authStatValue}>{t('auth_stat_4_val')}</span>
+                            <span className={styles.authStatLabel}>{t('auth_stat_4_lab')}</span>
                         </div>
                         <div className={styles.authStat}>
-                            <span className={styles.authStatValue}>1 min</span>
-                            <span className={styles.authStatLabel}>to add first sub</span>
+                            <span className={styles.authStatValue}>{t('auth_stat_5_val')}</span>
+                            <span className={styles.authStatLabel}>{t('auth_stat_5_lab')}</span>
                         </div>
                         <div className={styles.authStat}>
-                            <span className={styles.authStatValue}>∞</span>
-                            <span className={styles.authStatLabel}>subscriptions tracked</span>
+                            <span className={styles.authStatValue}>{t('auth_stat_6_val')}</span>
+                            <span className={styles.authStatLabel}>{t('auth_stat_6_lab')}</span>
                         </div>
                     </div>
                 </div>
@@ -75,11 +77,11 @@ export default function SignupPage() {
 
             <div className={styles.authRight}>
                 <div className={styles.authCard}>
-                    <h2>{step === 'credentials' ? 'Create your account' : 'Name your workspace'}</h2>
+                    <h2>{step === 'credentials' ? t('auth_create_account') : t('auth_name_workspace')}</h2>
                     <p className={styles.authSubtitle}>
                         {step === 'credentials'
-                            ? 'Start tracking your team subscriptions today'
-                            : "This is your organization's Subtrack workspace"}
+                            ? t('auth_signup_sub_1')
+                            : t('auth_signup_sub_2')}
                     </p>
 
                     {error && <div className={styles.authError}>{error}</div>}
@@ -94,10 +96,10 @@ export default function SignupPage() {
                                         <path d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="#FBBC05" />
                                         <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335" />
                                     </svg>
-                                    Continue with Google
+                                    {t('auth_google')}
                                 </button>
                             </div>
-                            <div className="divider-text">or</div>
+                            <div className="divider-text">{t('auth_or')}</div>
                         </>
                     )}
 
@@ -105,27 +107,27 @@ export default function SignupPage() {
                         {step === 'credentials' ? (
                             <>
                                 <div className="form-group">
-                                    <label className="form-label">Full name</label>
+                                    <label className="form-label">{t('auth_full_name')}</label>
                                     <div className={styles.inputWithIcon}>
                                         <User size={16} className={styles.inputIcon} />
-                                        <input type="text" className="form-input" placeholder="Ahmed Al-Mubaraks" value={fullName}
+                                        <input type="text" className="form-input" placeholder={t('auth_full_name_ph')} value={fullName}
                                             onChange={e => setFullName(e.target.value)} required />
                                     </div>
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label">Work email</label>
+                                    <label className="form-label">{t('auth_email_work')}</label>
                                     <div className={styles.inputWithIcon}>
                                         <Mail size={16} className={styles.inputIcon} />
-                                        <input type="email" className="form-input" placeholder="you@company.com" value={email}
+                                        <input type="email" className="form-input" placeholder={t('auth_email_ph')} value={email}
                                             onChange={e => setEmail(e.target.value)} required />
                                     </div>
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label">Password</label>
+                                    <label className="form-label">{t('auth_pw_label')}</label>
                                     <div className={styles.inputWithIcon}>
                                         <Lock size={16} className={styles.inputIcon} />
-                                        <input type={showPassword ? 'text' : 'password'} className="form-input" placeholder="Min. 8 characters"
-                                            value={password} onChange={e => setPassword(e.target.value)} required minLength={8} style={{ paddingRight: '42px' }} />
+                                        <input type={showPassword ? 'text' : 'password'} className="form-input" placeholder={t('auth_pw_min')}
+                                            value={password} onChange={e => setPassword(e.target.value)} required minLength={8} style={{ paddingInlineEnd: '42px' }} />
                                         <button type="button" className={styles.passwordToggle} onClick={() => setShowPassword(!showPassword)}>
                                             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                         </button>
@@ -134,18 +136,18 @@ export default function SignupPage() {
                             </>
                         ) : (
                             <div className="form-group">
-                                <label className="form-label">Organization / Company name</label>
+                                <label className="form-label">{t('auth_org_name')}</label>
                                 <div className={styles.inputWithIcon}>
                                     <Building2 size={16} className={styles.inputIcon} />
-                                    <input type="text" className="form-input" placeholder="Acme Corp" value={orgName}
+                                    <input type="text" className="form-input" placeholder={t('auth_org_name_ph')} value={orgName}
                                         onChange={e => setOrgName(e.target.value)} required />
                                 </div>
-                                <span className="form-hint">Your team members will join this workspace.</span>
+                                <span className="form-hint">{t('auth_org_hint')}</span>
                             </div>
                         )}
 
                         <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
-                            {loading ? 'Creating account…' : step === 'credentials' ? 'Continue →' : 'Create Workspace'}
+                            {loading ? t('auth_creating') : step === 'credentials' ? t('auth_continue') : t('auth_create_btn')}
                         </button>
 
                         {step === 'org' && (
