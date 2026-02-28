@@ -1,9 +1,6 @@
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 -- Organizations
 CREATE TABLE IF NOT EXISTS organizations (
-  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name       TEXT NOT NULL,
   slug       TEXT UNIQUE NOT NULL,
   plan       TEXT NOT NULL DEFAULT 'free',
@@ -12,15 +9,6 @@ CREATE TABLE IF NOT EXISTS organizations (
 
 ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "org_select" ON organizations
-  FOR SELECT USING (
-    id IN (SELECT org_id FROM profiles WHERE id = auth.uid())
-  );
-
-CREATE POLICY "org_update" ON organizations
-  FOR UPDATE USING (
-    id IN (SELECT org_id FROM profiles WHERE id = auth.uid() AND role = 'admin')
-  );
 
 -- Profiles (extends auth.users)
 CREATE TABLE IF NOT EXISTS profiles (
@@ -47,6 +35,17 @@ CREATE POLICY "profiles_update_self" ON profiles
 CREATE POLICY "profiles_update_admin" ON profiles
   FOR UPDATE USING (
     org_id IN (SELECT org_id FROM profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
+-- Organization Policies
+CREATE POLICY "org_select" ON organizations
+  FOR SELECT USING (
+    id IN (SELECT org_id FROM profiles WHERE id = auth.uid())
+  );
+
+CREATE POLICY "org_update" ON organizations
+  FOR UPDATE USING (
+    id IN (SELECT org_id FROM profiles WHERE id = auth.uid() AND role = 'admin')
   );
 
 -- Auto-create profile on signup

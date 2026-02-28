@@ -1,6 +1,6 @@
 -- Expenses
 CREATE TABLE IF NOT EXISTS expenses (
-  id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   org_id       UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
   title        TEXT NOT NULL,
   amount       NUMERIC(10,2) NOT NULL DEFAULT 0,
@@ -37,7 +37,7 @@ CREATE POLICY "expenses_delete" ON expenses
 
 -- Notifications
 CREATE TABLE IF NOT EXISTS notifications (
-  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   org_id          UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
   user_id         UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   subscription_id UUID REFERENCES subscriptions(id) ON DELETE SET NULL,

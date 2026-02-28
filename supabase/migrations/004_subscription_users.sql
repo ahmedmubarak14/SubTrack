@@ -1,6 +1,6 @@
 -- Subscription Users: M:N relationship between subscriptions and profiles
 CREATE TABLE IF NOT EXISTS subscription_users (
-  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   subscription_id UUID NOT NULL REFERENCES subscriptions(id) ON DELETE CASCADE,
   profile_id      UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   role            TEXT DEFAULT 'user' CHECK (role IN ('user', 'manager', 'admin')),
