@@ -157,7 +157,7 @@ export default function TeamClient({ members, subscriptions, currentProfile, org
                                                         <div style={{ display: 'flex', alignItems: 'center' }}>
                                                             {subscriptions.filter(s => s.owner_id === member.id).slice(0, 3).map((sub, i) => {
                                                                 const fallbackDomain = `${sub.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`;
-                                                                const computedLogoUrl = sub.logo_url || `https://www.google.com/s2/favicons?domain=${fallbackDomain}&sz=128`;
+                                                                const computedLogoUrl = sub.logo_url || `https://logo.clearbit.com/${fallbackDomain}`;
                                                                 return (
                                                                     <div key={sub.id || `sub-${i}`} style={{
                                                                         width: 26, height: 26, borderRadius: 6,

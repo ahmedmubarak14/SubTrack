@@ -68,11 +68,11 @@ export default function DashboardCalendar({ subscriptions }: Props) {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)' }}>
                 <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0 }}>{t('cal_title')}</h3>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                    <button className="btn btn-secondary btn-sm" onClick={prevMonth} style={{ padding: '4px 8px' }}>←</button>
+                    <button className="btn btn-secondary btn-sm" onClick={prevMonth} style={{ padding: '4px 8px' }}>{lang === 'ar' ? '→' : '←'}</button>
                     <span style={{ fontSize: '13px', fontWeight: 600, minWidth: 100, textAlign: 'center' }}>
                         {format(currentDate, 'MMM yyyy', { locale: lang === 'ar' ? ar : undefined })}
                     </span>
-                    <button className="btn btn-secondary btn-sm" onClick={nextMonth} style={{ padding: '4px 8px' }}>→</button>
+                    <button className="btn btn-secondary btn-sm" onClick={nextMonth} style={{ padding: '4px 8px' }}>{lang === 'ar' ? '←' : '→'}</button>
                 </div>
             </div>
 
@@ -108,7 +108,7 @@ export default function DashboardCalendar({ subscriptions }: Props) {
 
                             {daysSubs.slice(0, 4).map(sub => {
                                 const fallbackDomain = `${sub.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`;
-                                const computedLogoUrl = sub.logo_url || `https://www.google.com/s2/favicons?domain=${fallbackDomain}&sz=128`;
+                                const computedLogoUrl = sub.logo_url || `https://logo.clearbit.com/${fallbackDomain}`;
 
                                 return (
                                     <Link href={`/dashboard/subscriptions/detail?id=${sub.id}`} key={sub.id}

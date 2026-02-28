@@ -69,11 +69,11 @@ export default function CalendarClient({ subscriptions }: { subscriptions: Sub[]
     return (
         <div>
             <Topbar title={t('cal_title')} onToggleNotifications={openPanel}>
-                <button className="btn btn-secondary btn-sm" onClick={prevMonth}>{/* Note: Arrow Left */}<span style={{ fontSize: 14 }}>←</span></button>
+                <button className="btn btn-secondary btn-sm" onClick={prevMonth}>{/* Note: Arrow Left */}<span style={{ fontSize: 14 }}>{lang === 'ar' ? '→' : '←'}</span></button>
                 <span style={{ fontSize: '14px', fontWeight: 700, minWidth: 130, textAlign: 'center' }}>
                     {format(currentDate, 'MMMM yyyy', { locale: lang === 'ar' ? ar : undefined })}
                 </span>
-                <button className="btn btn-secondary btn-sm" onClick={nextMonth}>{/* Note: Arrow Right */}<span style={{ fontSize: 14 }}>→</span></button>
+                <button className="btn btn-secondary btn-sm" onClick={nextMonth}>{/* Note: Arrow Right */}<span style={{ fontSize: 14 }}>{lang === 'ar' ? '←' : '→'}</span></button>
             </Topbar>
 
             <div className="page-content">
@@ -112,7 +112,7 @@ export default function CalendarClient({ subscriptions }: { subscriptions: Sub[]
                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(28px, 1fr))', gap: '4px', padding: '0 4px', paddingBottom: '4px' }}>
                                             {daysSubs.slice(0, 8).map(sub => {
                                                 const fallbackDomain = `${sub.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`;
-                                                const computedLogoUrl = sub.logo_url || `https://www.google.com/s2/favicons?domain=${fallbackDomain}&sz=128`;
+                                                const computedLogoUrl = sub.logo_url || `https://logo.clearbit.com/${fallbackDomain}`;
 
                                                 return (
                                                     <div key={sub.id}
