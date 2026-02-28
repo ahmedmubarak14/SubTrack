@@ -2,11 +2,13 @@
 
 import { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, isToday, parseISO } from 'date-fns';
+import { ar } from 'date-fns/locale';
 import { Users } from 'lucide-react';
 import Link from 'next/link';
 import { CURRENCIES } from '@/types';
 import Topbar from '@/components/Topbar';
 import { useNotifications } from '@/components/NotificationsContext';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 interface Sub {
     id: string;
@@ -31,6 +33,7 @@ function formatCurrency(amount: number, currency = 'USD') {
 }
 
 export default function CalendarClient({ subscriptions }: { subscriptions: Sub[] }) {
+    const { t, lang } = useLanguage();
     const { openPanel } = useNotifications();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selected, setSelected] = useState<Sub | null>(null);
@@ -58,14 +61,17 @@ export default function CalendarClient({ subscriptions }: { subscriptions: Sub[]
         return map;
     }, [subscriptions]);
 
-    const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const DAYS = [
+        t('cal_day_sun'), t('cal_day_mon'), t('cal_day_tue'), t('cal_day_wed'),
+        t('cal_day_thu'), t('cal_day_fri'), t('cal_day_sat')
+    ];
 
     return (
         <div>
-            <Topbar title="Renewal Calendar" onToggleNotifications={openPanel}>
+            <Topbar title={t('cal_title')} onToggleNotifications={openPanel}>
                 <button className="btn btn-secondary btn-sm" onClick={prevMonth}>{/* Note: Arrow Left */}<span style={{ fontSize: 14 }}>←</span></button>
                 <span style={{ fontSize: '14px', fontWeight: 700, minWidth: 130, textAlign: 'center' }}>
-                    {format(currentDate, 'MMMM yyyy')}
+                    {format(currentDate, 'MMMM yyyy', { locale: lang === 'ar' ? ar : undefined })}
                 </span>
                 <button className="btn btn-secondary btn-sm" onClick={nextMonth}>{/* Note: Arrow Right */}<span style={{ fontSize: 14 }}>→</span></button>
             </Topbar>
@@ -76,7 +82,7 @@ export default function CalendarClient({ subscriptions }: { subscriptions: Sub[]
                     {Object.entries(STATUS_COLORS).map(([status, color]) => (
                         <div key={status} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '12px', fontWeight: 600, textTransform: 'capitalize' }}>
                             <div style={{ width: 10, height: 10, borderRadius: '50%', background: color }} />
-                            {status}
+                            {t(`cal_status_${status}` as any) || status}
                         </div>
                     ))}
                 </div>
@@ -140,7 +146,7 @@ export default function CalendarClient({ subscriptions }: { subscriptions: Sub[]
                                         ))}
                                         {daysSubs.length > 3 && (
                                             <div style={{ fontSize: '10px', color: 'var(--color-text-tertiary)', marginTop: 2, paddingLeft: 4 }}>
-                                                +{daysSubs.length - 3} more
+                                                +{daysSubs.length - 3} {t('cal_more')}
                                             </div>
                                         )}
                                     </div>
@@ -159,26 +165,26 @@ export default function CalendarClient({ subscriptions }: { subscriptions: Sub[]
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                                 <div>
-                                    <div style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Status</div>
-                                    <span className={`badge badge-${selected.status === 'active' ? 'green' : selected.status === 'trial' ? 'blue' : selected.status === 'expiring' ? 'orange' : 'red'}`} style={{ textTransform: 'capitalize' }}>{selected.status}</span>
+                                    <div style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>{t('modal_status')}</div>
+                                    <span className={`badge badge-${selected.status === 'active' ? 'green' : selected.status === 'trial' ? 'blue' : selected.status === 'expiring' ? 'orange' : 'red'}`} style={{ textTransform: 'capitalize' }}>{t(`cal_status_${selected.status}` as any) || selected.status}</span>
                                 </div>
                                 <div>
-                                    <div style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Cost</div>
+                                    <div style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>{t('modal_cost')}</div>
                                     <div style={{ fontWeight: 700, fontSize: '18px' }}>{formatCurrency(selected.cost, selected.currency)}</div>
-                                    <div style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>per {selected.billing_cycle}</div>
+                                    <div style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>{t('dash_col_billing')}: {selected.billing_cycle}</div>
                                 </div>
                                 <div>
-                                    <div style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Renewal Date</div>
-                                    <div style={{ fontWeight: 600 }}>{format(parseISO(selected.renewal_date), 'MMMM d, yyyy')}</div>
+                                    <div style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>{t('dash_col_renewal')}</div>
+                                    <div style={{ fontWeight: 600 }}>{format(parseISO(selected.renewal_date), 'MMMM d, yyyy', { locale: lang === 'ar' ? ar : undefined })}</div>
                                 </div>
                                 {selected.seats > 0 && (
                                     <div>
-                                        <div style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Users</div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}><Users size={14} /> {selected.seats} users</div>
+                                        <div style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>{t('team_seats')}</div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}><Users size={14} /> {selected.seats} {t('common_users')}</div>
                                     </div>
                                 )}
                                 <Link href={`/dashboard/subscriptions/detail?id=${selected.id}`} className="btn btn-secondary" style={{ justifyContent: 'center', marginTop: 4 }}>
-                                    View Details
+                                    {t('cal_view_details') || 'View Details'}
                                 </Link>
                             </div>
                         </div>

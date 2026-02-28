@@ -449,20 +449,6 @@ export default function SubTrackLanding() {
           <Link href="/signup" className="btn btn-primary btn-lg">{t('land_hero_cta')}</Link>
           <button className="btn btn-outline btn-lg" onClick={() => document.getElementById("how")?.scrollIntoView({ behavior: "smooth" })}>{t('land_hero_cta2')}</button>
         </div>
-        {/* Social proof strip */}
-        <div className="animate-fade-in" style={{ marginTop: 40, display: "flex", flexWrap: "wrap", gap: 24, justifyContent: "center", animationDelay: "0.45s" }}>
-          {[
-            { icon: "🔒", text: t('land_proof_1') as string },
-            { icon: "⚡", text: t('land_proof_2') as string },
-            { icon: "💳", text: t('land_proof_3') as string },
-            { icon: "🔗", text: t('land_proof_4') as string },
-          ].map(p => (
-            <div key={p.text} style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 14, color: MUTED_FG, fontWeight: 500 }}>
-              <span>{p.icon}</span>
-              <span>{p.text}</span>
-            </div>
-          ))}
-        </div>
       </section>
 
       {/* Stats */}

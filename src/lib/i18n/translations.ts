@@ -121,6 +121,7 @@ const en = {
     // Calendar
     cal_title: 'Renewal Calendar',
     cal_no_renewals: 'No renewals',
+    cal_view_details: 'View Details',
 
     // Team
     team_title: 'Team',
@@ -208,7 +209,7 @@ const en = {
     land_nav_get_started: 'Get started',
     land_hero_badge: '🏆 Trusted by finance & ops teams at 500+ companies',
     land_hero_title: 'Your SaaS spend is\nbleeding you dry.',
-    land_hero_desc: 'SubTrack gives enterprise teams a single command center to track every subscription, audit every expense, and eliminate every dollar wasted — before your next board meeting.',
+    land_hero_desc: 'SubTrack gives enterprise teams a single command center to track every subscription, audit every expense, and eliminate every dollar wasted.',
     land_hero_cta: 'Get a free spend audit 🚀',
     land_hero_cta2: 'See how it works',
     land_proof_1: 'SOC 2 compliant',
@@ -255,11 +256,11 @@ const en = {
     land_price_popular: 'Most popular',
     land_price_free: 'Free',
     land_price_free_desc: 'Perfect for small teams just getting started.',
-    land_price_free_f1: 'Up to 5 users',
-    land_price_free_f2: 'Up to 5 subscriptions',
-    land_price_free_f3: 'Renewal reminders',
-    land_price_free_f4: 'Basic spend reports',
-    land_price_free_cta: 'Get started free',
+    land_price_free_f1: 'Up to 3 users',
+    land_price_free_f2: 'Up to 20 subscriptions',
+    land_price_free_f3: 'Basic renewal alerts',
+    land_price_free_f4: 'Join the waitlist',
+    land_price_free_cta: 'Get started for free',
 
     land_price_pro: 'Pro',
     land_price_pro_desc: 'Everything you need to manage a growing stack.',
@@ -409,10 +410,6 @@ const en = {
     subs_search_ph: 'Search subscriptions…',
     subs_status_all: 'All statuses',
     subs_cat_all: 'All categories',
-    subs_empty_title: 'No subscriptions yet',
-    subs_empty_sub: 'Add your first subscription to start tracking.',
-
-
 };
 
 const ar: typeof en = {
@@ -529,6 +526,7 @@ const ar: typeof en = {
 
     cal_title: 'تقويم التجديدات',
     cal_no_renewals: 'لا تجديدات',
+    cal_view_details: 'عرض التفاصيل',
 
     team_title: 'الفريق',
     team_invite: 'دعوة عضو',
@@ -611,10 +609,10 @@ const ar: typeof en = {
     land_nav_pricing: 'الأسعار',
     land_nav_login: 'تسجيل الدخول',
     land_nav_get_started: 'ابدأ الآن',
-    land_hero_badge: '🏆 موثوق من فرق المالية والعمليات في أكثر من 500 شركة',
-    land_hero_title: 'إنفاقك على البرمجيات\nيستنزف ميزانيتك.',
-    land_hero_desc: 'توفر SubTrack لفرق الشركات مركز تحكم واحد لتتبع كل اشتراك، ومراجعة كل نفقات، والتخلص من كل دولار مهدر — قبل اجتماع مجلس الإدارة القادم.',
-    land_hero_cta: 'احصل على مراجعة مجانية لنفقاتك 🚀',
+    land_hero_badge: '🏆 موثوق من قبل فرق المالية والعمليات في أكثر من 500 شركة',
+    land_hero_title: 'الإنفاق على الاشتراكات\nيستنزف ميزانيتك.',
+    land_hero_desc: 'تمنح منصة SubTrack فرق العمل مركز تحكم واحد لتتبع كل اشتراك، تدقيق كل مصروف، والقضاء على كل دولار مهدر.',
+    land_hero_cta: 'احصل على تدقيق مجاني لنفقاتك 🚀',
     land_hero_cta2: 'شاهد كيف تعمل',
     land_proof_1: 'متوافق مع SOC 2',
     land_proof_2: 'إعداد في 5 دقائق',
@@ -660,10 +658,10 @@ const ar: typeof en = {
     land_price_popular: 'الأكثر شعبية',
     land_price_free: 'مجاني',
     land_price_free_desc: 'مثالي للفرق الصغيرة التي بدأت للتو.',
-    land_price_free_f1: 'حتى 5 مستخدمين',
-    land_price_free_f2: 'حتى 5 اشتراكات',
-    land_price_free_f3: 'تذكيرات التجديد',
-    land_price_free_f4: 'تقارير إنفاق أساسية',
+    land_price_free_f1: 'حتى 3 مستخدمين',
+    land_price_free_f2: 'حتى 20 اشتراكاً',
+    land_price_free_f3: 'تنبيهات أساسية للتجديد',
+    land_price_free_f4: 'انضم إلى قائمة الانتظار',
     land_price_free_cta: 'ابدأ مجاناً',
 
     land_price_pro: 'برو',
@@ -814,10 +812,6 @@ const ar: typeof en = {
     subs_search_ph: 'البحث في الاشتراكات…',
     subs_status_all: 'كل الحالات',
     subs_cat_all: 'كل الفئات',
-    subs_empty_title: 'لا يوجد اشتراكات بعد',
-    subs_empty_sub: 'أضف اشتراكك الأول للبدء في التتبع.',
-
-
 };
 
 export const translations: Record<Lang, typeof en> = { en, ar };

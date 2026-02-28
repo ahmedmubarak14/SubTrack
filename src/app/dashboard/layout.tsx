@@ -10,6 +10,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const router = useRouter();
     const [profile, setProfile] = useState<Profile | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     useEffect(() => {
         const supabase = createClient();
@@ -35,8 +36,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     return (
         <NotificationsProvider>
-            <div className="app-shell">
-                <Sidebar profile={profile} />
+            <div className={`app-shell ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+                {/* Mobile Hamburger Menu directly inside layout for all pages */}
+                <div className="mobile-header">
+                    <button className="mobile-menu-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            {isSidebarOpen ? <path d="M18 6L6 18M6 6l12 12" /> : <path d="M3 12h18M3 6h18M3 18h18" />}
+                        </svg>
+                    </button>
+                </div>
+                {/* Overlay for mobile clicking away */}
+                {isSidebarOpen && (
+                    <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />
+                )}
+                <Sidebar profile={profile} onClose={() => setIsSidebarOpen(false)} />
                 <div className="main-content">
                     {children}
                 </div>

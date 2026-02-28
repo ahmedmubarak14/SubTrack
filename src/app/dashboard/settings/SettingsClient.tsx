@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { Building2, Globe, Bell, LogOut, Lock, User } from 'lucide-react';
@@ -24,6 +24,58 @@ export default function SettingsClient({ profile, orgName, orgId }: Props) {
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [error, setError] = useState('');
+
+    const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url ?? '');
+    const [logoUrl, setLogoUrl] = useState(''); // Would ideally come from org data if we passed it
+
+    // Fetch org details specifically for logo on load
+    useEffect(() => {
+        if (orgId) {
+            supabase.from('organizations').select('logo_url').eq('id', orgId).single().then(({ data }: any) => {
+                if (data?.logo_url) setLogoUrl(data.logo_url);
+            });
+        }
+    }, [orgId, supabase]);
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, bucket: string): Promise<string | null> => {
+        const file = e.target.files?.[0];
+        if (!file) return null;
+
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${profile?.id}/${fileName}`;
+
+        setSaving(true);
+        setError('');
+        try {
+            const { error: uploadError } = await supabase.storage.from(bucket).upload(filePath, file);
+            if (uploadError) throw uploadError;
+
+            const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
+            setSaving(false);
+            return data.publicUrl;
+        } catch (err: any) {
+            setError(err.message ?? 'Error uploading file');
+            setSaving(false);
+            return null;
+        }
+    };
+
+    const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const url = await handleFileUpload(e, 'avatars');
+        if (url) {
+            setAvatarUrl(url);
+            await supabase.from('profiles').update({ avatar_url: url }).eq('id', profile!.id);
+        }
+    };
+
+    const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const url = await handleFileUpload(e, 'logos');
+        if (url && orgId && profile?.role === 'admin') {
+            setLogoUrl(url);
+            await supabase.from('organizations').update({ logo_url: url }).eq('id', orgId);
+        }
+    };
 
     // Password change
     const [currentPw, setCurrentPw] = useState('');
@@ -109,8 +161,13 @@ export default function SettingsClient({ profile, orgName, orgId }: Props) {
                     {/* Profile */}
                     <div className="card">
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 'var(--space-5)' }}>
-                            <div className="icon-wrap" style={{ background: 'var(--color-purple-bg)' }}>
-                                <User size={20} color="var(--color-purple)" />
+                            <div className="icon-wrap" style={{ background: 'var(--color-purple-bg)', overflow: 'hidden', padding: avatarUrl ? 0 : '', position: 'relative' }}>
+                                {avatarUrl ? (
+                                    <img src={avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ) : (
+                                    <User size={20} color="var(--color-purple)" />
+                                )}
+                                <input type="file" accept="image/*" onChange={handleAvatarUpload} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} title="Change Avatar" />
                             </div>
                             <div>
                                 <div style={{ fontWeight: 700 }}>{t('settings_profile')}</div>
@@ -137,8 +194,15 @@ export default function SettingsClient({ profile, orgName, orgId }: Props) {
                     {/* Organization */}
                     <div className="card">
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 'var(--space-5)' }}>
-                            <div className="icon-wrap" style={{ background: 'var(--color-blue-bg)' }}>
-                                <Globe size={20} color="var(--color-blue)" />
+                            <div className="icon-wrap" style={{ background: 'var(--color-blue-bg)', overflow: 'hidden', padding: logoUrl ? 0 : '', position: 'relative' }}>
+                                {logoUrl ? (
+                                    <img src={logoUrl} alt="Org Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ) : (
+                                    <Globe size={20} color="var(--color-blue)" />
+                                )}
+                                {profile?.role === 'admin' && (
+                                    <input type="file" accept="image/*" onChange={handleLogoUpload} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} title="Change Org Logo" />
+                                )}
                             </div>
                             <div>
                                 <div style={{ fontWeight: 700 }}>{t('settings_org')}</div>

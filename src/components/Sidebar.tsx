@@ -14,9 +14,10 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 interface SidebarProps {
     profile?: Profile | null;
     onToggleNotifications?: () => void;
+    onClose?: () => void;
 }
 
-export default function Sidebar({ profile, onToggleNotifications }: SidebarProps) {
+export default function Sidebar({ profile, onToggleNotifications, onClose }: SidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
     const supabase = createClient();
@@ -59,7 +60,12 @@ export default function Sidebar({ profile, onToggleNotifications }: SidebarProps
                 {navItems.map(({ href, label, icon: Icon }) => {
                     const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
                     return (
-                        <Link key={href} href={href} className={`sidebar-link ${isActive ? 'active' : ''}`}>
+                        <Link
+                            key={href}
+                            href={href}
+                            className={`sidebar-link ${isActive ? 'active' : ''}`}
+                            onClick={() => onClose?.()}
+                        >
                             <Icon size={18} />
                             {label}
                         </Link>
@@ -69,7 +75,11 @@ export default function Sidebar({ profile, onToggleNotifications }: SidebarProps
                 <div className="sidebar-section-label" style={{ marginBottom: '8px', marginTop: '20px' }}>
                     {t('nav_account')}
                 </div>
-                <Link href="/dashboard/settings" className={`sidebar-link ${pathname.startsWith('/dashboard/settings') ? 'active' : ''}`}>
+                <Link
+                    href="/dashboard/settings"
+                    className={`sidebar-link ${pathname.startsWith('/dashboard/settings') ? 'active' : ''}`}
+                    onClick={() => onClose?.()}
+                >
                     <Settings size={18} />
                     {t('nav_settings')}
                 </Link>
@@ -82,13 +92,25 @@ export default function Sidebar({ profile, onToggleNotifications }: SidebarProps
 
             {/* User footer */}
             <div className="sidebar-footer">
-                <div className="sidebar-user" onClick={handleLogout} title="Sign out">
-                    <div className="sidebar-avatar">{initials}</div>
+                <div className="sidebar-user">
+                    <div className="sidebar-avatar" style={{ overflow: 'hidden', padding: profile?.avatar_url ? 0 : '' }}>
+                        {profile?.avatar_url ? (
+                            <img src={profile.avatar_url} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                            initials
+                        )}
+                    </div>
                     <div className="sidebar-user-info">
                         <div className="sidebar-user-name">{profile?.full_name || profile?.email?.split('@')[0] || 'User'}</div>
                         <div className="sidebar-user-role" style={{ textTransform: 'capitalize' }}>{profile?.role ?? 'member'}</div>
                     </div>
-                    <LogOut size={16} style={{ color: 'rgba(255,255,255,0.4)', marginLeft: 'auto', flexShrink: 0 }} />
+                    <button
+                        onClick={handleLogout}
+                        title="Sign out"
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex' }}
+                    >
+                        <LogOut size={16} style={{ color: 'rgba(255,255,255,0.4)', marginLeft: 'auto', flexShrink: 0 }} />
+                    </button>
                 </div>
             </div>
         </nav>

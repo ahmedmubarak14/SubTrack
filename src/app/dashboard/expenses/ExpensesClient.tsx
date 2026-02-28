@@ -105,9 +105,9 @@ export default function ExpensesClient({ expenses: initialExpenses, orgId, profi
 
     return (
         <div>
-            <Topbar title="Expenses" onToggleNotifications={openPanel}>
+            <Topbar title={t('exp_title')} onToggleNotifications={openPanel}>
                 <button className="btn btn-primary btn-sm" onClick={() => setShowAdd(true)}>
-                    <Plus size={14} /> Add Expense
+                    <Plus size={14} /> {t('exp_add')}
                 </button>
             </Topbar>
 
@@ -115,8 +115,8 @@ export default function ExpensesClient({ expenses: initialExpenses, orgId, profi
                 {/* Summary strip */}
                 <div style={{ display: 'flex', gap: 'var(--space-4)', marginBottom: 'var(--space-6)', flexWrap: 'wrap' }}>
                     {[
-                        { label: t('exp_summary_month'), value: formatCurrency(totalThisMonth), color: 'var(--color-purple)' },
-                        { label: t('exp_summary_total'), value: expenses.length, color: 'var(--color-blue)' },
+                        { label: t('exp_this_month'), value: formatCurrency(totalThisMonth), color: 'var(--color-purple)' },
+                        { label: t('exp_total'), value: expenses.length, color: 'var(--color-blue)' },
                     ].map(({ label, value, color }) => (
                         <div key={label} style={{ background: 'var(--color-bg-secondary)', border: '1.5px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: '10px 18px', display: 'flex', flexDirection: 'column', minWidth: 120 }}>
                             <span style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</span>
@@ -129,10 +129,10 @@ export default function ExpensesClient({ expenses: initialExpenses, orgId, profi
                 <div className="filter-bar">
                     <div className="search-input-wrapper">
                         <Search size={15} />
-                        <input className="form-input" placeholder={t('exp_search_ph')} value={search} onChange={e => setSearch(e.target.value)} />
+                        <input className="form-input" placeholder={t('exp_search')} value={search} onChange={e => setSearch(e.target.value)} />
                     </div>
                     <select className="form-select" style={{ width: 'auto' }} value={catFilter} onChange={e => setCatFilter(e.target.value)}>
-                        {categories.map(c => <option key={c} value={c}>{c === 'all' ? t('exp_cat_all') : c}</option>)}
+                        {categories.map(c => <option key={c} value={c}>{c === 'all' ? t('subs_cat_all') : c}</option>)}
                     </select>
                 </div>
 
@@ -143,9 +143,9 @@ export default function ExpensesClient({ expenses: initialExpenses, orgId, profi
                             <tr>
                                 <th>{t('exp_col_expense')}</th>
                                 <th>{t('exp_col_category')}</th>
-                                <th>{t('exp_col_department')}</th>
+                                <th>{t('exp_col_dept')}</th>
                                 <th>{t('exp_col_date')}</th>
-                                <th>{t('exp_col_added_by')}</th>
+                                <th>{t('exp_col_by')}</th>
                                 <th>{t('exp_col_amount')}</th>
                                 <th></th>
                             </tr>
@@ -155,9 +155,9 @@ export default function ExpensesClient({ expenses: initialExpenses, orgId, profi
                                 <tr><td colSpan={7}>
                                     <div className="empty-state">
                                         <div className="empty-state-icon"><Plus size={28} /></div>
-                                        <h3>{t('exp_empty_title')}</h3>
-                                        <p>{t('exp_empty_sub')}</p>
-                                        <button className="btn btn-primary" onClick={() => setShowAdd(true)}><Plus size={14} /> {t('exp_add_btn')}</button>
+                                        <h3>{t('exp_no_expenses')}</h3>
+                                        <p>{t('exp_no_expenses_desc')}</p>
+                                        <button className="btn btn-primary" onClick={() => setShowAdd(true)}><Plus size={14} /> {t('exp_add')}</button>
                                     </div>
                                 </td></tr>
                             ) : filtered.map(exp => (
@@ -191,57 +191,57 @@ export default function ExpensesClient({ expenses: initialExpenses, orgId, profi
                 <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) setShowAdd(false); }}>
                     <div className="modal">
                         <div className="modal-header">
-                            <h2 className="modal-title">Add Expense</h2>
+                            <h2 className="modal-title">{t('exp_add')}</h2>
                             <button className="modal-close" onClick={() => setShowAdd(false)}>✕</button>
                         </div>
                         <form onSubmit={handleAddExpense}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
                                 <div className="form-group">
-                                    <label className="form-label">Title *</label>
-                                    <input className="form-input" placeholder="e.g. AWS Invoice March" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
+                                    <label className="form-label">{t('exp_title_field')}</label>
+                                    <input className="form-input" placeholder={t('exp_title_ph')} value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr', gap: 8 }}>
                                     <div className="form-group">
-                                        <label className="form-label">Currency</label>
+                                        <label className="form-label">{t('exp_currency')}</label>
                                         <select className="form-select" value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
                                             {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code}</option>)}
                                         </select>
                                     </div>
                                     <div className="form-group">
-                                        <label className="form-label">Amount *</label>
+                                        <label className="form-label">{t('exp_amount')}</label>
                                         <input className="form-input" type="number" placeholder="0.00" step="0.01" min="0" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} required />
                                     </div>
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                                     <div className="form-group">
-                                        <label className="form-label">Category</label>
+                                        <label className="form-label">{t('exp_col_category')}</label>
                                         <select className="form-select" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
                                             {EXPENSE_CATEGORIES.map(c => <option key={c}>{c}</option>)}
                                         </select>
                                     </div>
                                     <div className="form-group">
-                                        <label className="form-label">Date *</label>
+                                        <label className="form-label">{t('exp_date')}</label>
                                         <input className="form-input" type="date" value={form.expense_date} onChange={e => setForm(f => ({ ...f, expense_date: e.target.value }))} required />
                                     </div>
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                                     <div className="form-group">
-                                        <label className="form-label">Department</label>
+                                        <label className="form-label">{t('exp_dept')}</label>
                                         <input className="form-input" placeholder="e.g. Engineering" value={form.department} onChange={e => setForm(f => ({ ...f, department: e.target.value }))} />
                                     </div>
                                     <div className="form-group">
-                                        <label className="form-label">Project</label>
+                                        <label className="form-label">{t('exp_project')}</label>
                                         <input className="form-input" placeholder="e.g. Q1 Campaign" value={form.project} onChange={e => setForm(f => ({ ...f, project: e.target.value }))} />
                                     </div>
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label">Notes</label>
+                                    <label className="form-label">{t('exp_notes')}</label>
                                     <textarea className="form-textarea" rows={2} placeholder="Any additional context…" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
                                 </div>
                             </div>
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={() => setShowAdd(false)}>Cancel</button>
-                                <button type="submit" className="btn btn-primary" disabled={submitting}>{submitting ? 'Saving…' : 'Add Expense'}</button>
+                                <button type="button" className="btn btn-secondary" onClick={() => setShowAdd(false)}>{t('common_cancel')}</button>
+                                <button type="submit" className="btn btn-primary" disabled={submitting}>{submitting ? t('modal_saving') : t('exp_add')}</button>
                             </div>
                         </form>
                     </div>

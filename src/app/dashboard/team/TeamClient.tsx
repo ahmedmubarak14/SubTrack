@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Users, Shield, Eye, BarChart2, X, Mail, TrendingUp } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { createClient } from '@/lib/supabase/client';
 import type { Profile, Subscription } from '@/types';
 import Topbar from '@/components/Topbar';
 import { useNotifications } from '@/components/NotificationsContext';
@@ -57,13 +58,15 @@ export default function TeamClient({ members, subscriptions, currentProfile, org
         setInviteError('');
         setInviteSuccess('');
         try {
-            const res = await fetch('/api/invite', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: inviteEmail, role: inviteRole, orgId }),
+            const supabase = createClient();
+            const { data, error: fnError } = await supabase.functions.invoke('invite-user', {
+                body: { email: inviteEmail, role: inviteRole, orgId }
             });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error ?? 'Invite failed');
+
+            if (fnError || data?.error) {
+                throw new Error(fnError?.message || data?.error || 'Invite failed');
+            }
+
             setInviteSuccess(`Invitation sent to ${inviteEmail}! They'll receive an email to set their password.`);
             setInviteEmail('');
             setTimeout(() => { setShowInvite(false); setInviteSuccess(''); }, 3000);

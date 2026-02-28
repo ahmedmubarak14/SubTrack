@@ -53,35 +53,14 @@ export default function SignupPage() {
 
     return (
         <div className={styles.authPage} dir={isRTL ? 'rtl' : 'ltr'}>
-            <div className={styles.authLeft}>
+            <div className={styles.langSwitcherWrapper}>
+                <LanguageSwitcher />
+            </div>
+            <div className={styles.authRight}>
                 <div className={styles.authBrand}>
                     <Link href="/">
-                        <img src="/SubTrack/logo-white.png" alt="Subtrack" className="sidebar-logo-img" style={{ height: 32, width: 'auto', cursor: 'pointer' }} />
+                        <img src="/SubTrack/logo-light.png" alt="Subtrack" className="sidebar-logo-img" style={{ height: 32, width: 'auto', cursor: 'pointer' }} />
                     </Link>
-                </div>
-                <div className={styles.authHero}>
-                    <h1 style={{ whiteSpace: 'pre-line' }}>{t('auth_hero_2_title')}</h1>
-                    <p>{t('auth_hero_2_sub')}</p>
-                    <div className={styles.authStats}>
-                        <div className={styles.authStat}>
-                            <span className={styles.authStatValue}>{t('auth_stat_4_val')}</span>
-                            <span className={styles.authStatLabel}>{t('auth_stat_4_lab')}</span>
-                        </div>
-                        <div className={styles.authStat}>
-                            <span className={styles.authStatValue}>{t('auth_stat_5_val')}</span>
-                            <span className={styles.authStatLabel}>{t('auth_stat_5_lab')}</span>
-                        </div>
-                        <div className={styles.authStat}>
-                            <span className={styles.authStatValue}>{t('auth_stat_6_val')}</span>
-                            <span className={styles.authStatLabel}>{t('auth_stat_6_lab')}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className={styles.authRight}>
-                <div style={{ position: 'absolute', top: '10px', right: isRTL ? 'auto' : '10px', left: isRTL ? '10px' : 'auto', zIndex: 10 }}>
-                    <LanguageSwitcher />
                 </div>
                 <div className={styles.authCard}>
                     <h2>{step === 'credentials' ? t('auth_create_account') : t('auth_name_workspace')}</h2>

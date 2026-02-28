@@ -50,35 +50,14 @@ export default function LoginPage() {
 
     return (
         <div className={styles.authPage} dir={isRTL ? 'rtl' : 'ltr'}>
-            <div className={styles.authLeft}>
+            <div className={styles.langSwitcherWrapper}>
+                <LanguageSwitcher />
+            </div>
+            <div className={styles.authRight}>
                 <div className={styles.authBrand}>
                     <Link href="/">
-                        <img src="/SubTrack/logo-white.png" alt="Subtrack" className="sidebar-logo-img" style={{ height: 32, width: 'auto', cursor: 'pointer' }} />
+                        <img src="/SubTrack/logo-light.png" alt="Subtrack" className="sidebar-logo-img" style={{ height: 32, width: 'auto', cursor: 'pointer' }} />
                     </Link>
-                </div>
-                <div className={styles.authHero}>
-                    <h1 style={{ whiteSpace: 'pre-line' }}>{t('auth_hero_1_title')}</h1>
-                    <p>{t('auth_hero_1_sub')}</p>
-                    <div className={styles.authStats}>
-                        <div className={styles.authStat}>
-                            <span className={styles.authStatValue}>{t('auth_stat_1_val')}</span>
-                            <span className={styles.authStatLabel}>{t('auth_stat_1_lab')}</span>
-                        </div>
-                        <div className={styles.authStat}>
-                            <span className={styles.authStatValue}>{t('auth_stat_2_val')}</span>
-                            <span className={styles.authStatLabel}>{t('auth_stat_2_lab')}</span>
-                        </div>
-                        <div className={styles.authStat}>
-                            <span className={styles.authStatValue}>{t('auth_stat_3_val')}</span>
-                            <span className={styles.authStatLabel}>{t('auth_stat_3_lab')}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className={styles.authRight}>
-                <div style={{ position: 'absolute', top: '10px', right: isRTL ? 'auto' : '10px', left: isRTL ? '10px' : 'auto', zIndex: 10 }}>
-                    <LanguageSwitcher />
                 </div>
                 <div className={styles.authCard}>
                     <h2>{t('auth_welcome_back')}</h2>
