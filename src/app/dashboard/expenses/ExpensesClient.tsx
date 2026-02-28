@@ -2,8 +2,10 @@
 
 import { useState, useMemo } from 'react';
 import { format, parseISO, startOfMonth, endOfMonth } from 'date-fns';
-import { Search, Plus, Trash2 } from 'lucide-react';
+import { Plus, Search, Trash2, Calendar, FileText, Download } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { useRouter } from 'next/navigation';
 import type { Profile } from '@/types';
 import { CURRENCIES, EXPENSE_CATEGORIES } from '@/types';
 import Topbar from '@/components/Topbar';
@@ -30,10 +32,11 @@ interface Props {
 
 function formatCurrency(amount: number, currency = 'USD') {
     const sym = CURRENCIES.find(c => c.code === currency)?.symbol ?? '$';
-    return `${sym}${amount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+    return `${sym}${amount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} `;
 }
 
 export default function ExpensesClient({ expenses: initialExpenses, orgId, profile }: Props) {
+    const { t } = useLanguage();
     const { openPanel } = useNotifications();
     const supabase = createClient();
     const [expenses, setExpenses] = useState(initialExpenses);
@@ -112,8 +115,8 @@ export default function ExpensesClient({ expenses: initialExpenses, orgId, profi
                 {/* Summary strip */}
                 <div style={{ display: 'flex', gap: 'var(--space-4)', marginBottom: 'var(--space-6)', flexWrap: 'wrap' }}>
                     {[
-                        { label: 'This Month', value: formatCurrency(totalThisMonth), color: 'var(--color-purple)' },
-                        { label: 'Total Expenses', value: expenses.length, color: 'var(--color-blue)' },
+                        { label: t('exp_summary_month'), value: formatCurrency(totalThisMonth), color: 'var(--color-purple)' },
+                        { label: t('exp_summary_total'), value: expenses.length, color: 'var(--color-blue)' },
                     ].map(({ label, value, color }) => (
                         <div key={label} style={{ background: 'var(--color-bg-secondary)', border: '1.5px solid var(--color-border)', borderRadius: 'var(--radius-lg)', padding: '10px 18px', display: 'flex', flexDirection: 'column', minWidth: 120 }}>
                             <span style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</span>
@@ -126,10 +129,10 @@ export default function ExpensesClient({ expenses: initialExpenses, orgId, profi
                 <div className="filter-bar">
                     <div className="search-input-wrapper">
                         <Search size={15} />
-                        <input className="form-input" placeholder="Search expenses…" value={search} onChange={e => setSearch(e.target.value)} />
+                        <input className="form-input" placeholder={t('exp_search_ph')} value={search} onChange={e => setSearch(e.target.value)} />
                     </div>
                     <select className="form-select" style={{ width: 'auto' }} value={catFilter} onChange={e => setCatFilter(e.target.value)}>
-                        {categories.map(c => <option key={c} value={c}>{c === 'all' ? 'All categories' : c}</option>)}
+                        {categories.map(c => <option key={c} value={c}>{c === 'all' ? t('exp_cat_all') : c}</option>)}
                     </select>
                 </div>
 
@@ -138,12 +141,12 @@ export default function ExpensesClient({ expenses: initialExpenses, orgId, profi
                     <table className="table">
                         <thead>
                             <tr>
-                                <th>Expense</th>
-                                <th>Category</th>
-                                <th>Department</th>
-                                <th>Date</th>
-                                <th>Added by</th>
-                                <th>Amount</th>
+                                <th>{t('exp_col_expense')}</th>
+                                <th>{t('exp_col_category')}</th>
+                                <th>{t('exp_col_department')}</th>
+                                <th>{t('exp_col_date')}</th>
+                                <th>{t('exp_col_added_by')}</th>
+                                <th>{t('exp_col_amount')}</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -152,9 +155,9 @@ export default function ExpensesClient({ expenses: initialExpenses, orgId, profi
                                 <tr><td colSpan={7}>
                                     <div className="empty-state">
                                         <div className="empty-state-icon"><Plus size={28} /></div>
-                                        <h3>No expenses yet</h3>
-                                        <p>Log your first expense to start tracking.</p>
-                                        <button className="btn btn-primary" onClick={() => setShowAdd(true)}><Plus size={14} /> Add Expense</button>
+                                        <h3>{t('exp_empty_title')}</h3>
+                                        <p>{t('exp_empty_sub')}</p>
+                                        <button className="btn btn-primary" onClick={() => setShowAdd(true)}><Plus size={14} /> {t('exp_add_btn')}</button>
                                     </div>
                                 </td></tr>
                             ) : filtered.map(exp => (

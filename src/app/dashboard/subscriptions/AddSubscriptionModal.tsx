@@ -378,11 +378,11 @@ export default function AddSubscriptionModal({ onClose, subscription, teamMember
                                             <DollarSign size={14} color={computedTotal !== null ? 'var(--color-green)' : 'var(--color-text-tertiary)'} />
                                             {computedTotal !== null ? (
                                                 <span>
-                                                    <strong>{currSym}{computedTotal.toFixed(2)}</strong> total
+                                                    <strong>{currSym}{computedTotal.toFixed(2)}</strong> {t('modal_total_label')}
                                                     &nbsp;({currSym}{parseFloat(form.pricePerUser || '0').toFixed(2)} × {form.seats || 1} users/{form.billing_cycle})
                                                 </span>
                                             ) : (
-                                                <span style={{ color: 'var(--color-text-tertiary)' }}>Enter price per user to auto-calculate total</span>
+                                                <span style={{ color: 'var(--color-text-tertiary)' }}>{t('modal_enter_price')}</span>
                                             )}
                                         </div>
                                     )}
@@ -394,7 +394,7 @@ export default function AddSubscriptionModal({ onClose, subscription, teamMember
                                             <input
                                                 className="form-input"
                                                 type="number" min="0"
-                                                placeholder="Number of seats (optional)"
+                                                placeholder={t('modal_seats_optional')}
                                                 value={form.seats}
                                                 onChange={e => set('seats', e.target.value)}
                                                 style={{ maxWidth: 200 }}
@@ -407,26 +407,26 @@ export default function AddSubscriptionModal({ onClose, subscription, teamMember
                                 <DatePicker
                                     value={form.start_date}
                                     onChange={v => { set('start_date', v); setRenewalEdited(false); }}
-                                    label="Start Date"
-                                    placeholder="Select start date"
+                                    label={t('modal_start_date')}
+                                    placeholder={t('modal_select_start')}
                                 />
 
                                 <DatePicker
                                     value={form.renewal_date}
                                     onChange={v => { set('renewal_date', v); if (v !== calcRenewalDate(form.start_date, form.billing_cycle)) setRenewalEdited(true); }}
-                                    label="Renewal Date"
-                                    placeholder="Select renewal date"
+                                    label={t('modal_renewal_date')}
+                                    placeholder={t('modal_select_renewal')}
                                     badge={
                                         !renewalEdited && form.start_date ? (
                                             <span style={{ fontSize: 10, background: 'var(--color-green-bg)', color: 'var(--color-green)', padding: '1px 6px', borderRadius: 10, fontWeight: 600 }}>
-                                                Auto-calculated
+                                                {t('modal_auto_calc')}
                                             </span>
                                         ) : undefined
                                     }
                                     hint={
                                         !renewalEdited && form.start_date ? (
                                             <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--color-text-tertiary)' }}>
-                                                <Info size={11} /> Based on start date + {form.billing_cycle} cycle. Edit to override.
+                                                <Info size={11} /> {t('modal_based_on')}{form.billing_cycle}{t('modal_cycle_edit')}
                                             </span>
                                         ) : undefined
                                     }

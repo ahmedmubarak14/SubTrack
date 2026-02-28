@@ -135,10 +135,10 @@ export default function TeamClient({ members, subscriptions, currentProfile, org
                                     <div style={{ flex: 1, minWidth: 0, zIndex: 1 }}>
                                         <div style={{ fontWeight: 800, fontSize: 16, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-text-primary)' }}>
                                             {member.full_name || member.email?.split('@')[0] || 'Unknown'}
-                                            {isYou && <span style={{ fontSize: 10, background: 'var(--color-purple-bg)', color: 'var(--color-purple)', padding: '2px 6px', borderRadius: 4, fontWeight: 700, letterSpacing: '0.05em' }}>YOU</span>}
+                                            {isYou && <span style={{ fontSize: 10, background: 'var(--color-purple-bg)', color: 'var(--color-purple)', padding: '2px 6px', borderRadius: 4, fontWeight: 700, letterSpacing: '0.05em' }}>{t('team_you_badge')}</span>}
                                         </div>
                                         <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginTop: 4 }}>
-                                            {member.role === 'admin' ? 'Workspace Admin' : member.role === 'manager' ? 'Team Lead' : 'Member'}
+                                            {member.role === 'admin' ? t('team_role_admin_display') : member.role === 'manager' ? t('team_role_manager_display') : t('team_role_member_display')}
                                         </div>
                                     </div>
                                 </div>
@@ -147,7 +147,7 @@ export default function TeamClient({ members, subscriptions, currentProfile, org
                                 <div style={{ display: 'flex', gap: 12, zIndex: 1, marginTop: 'auto' }}>
                                     {/* Tools Owned Box inner glass */}
                                     <div style={{ flex: 1, background: 'rgba(255,255,255,0.5)', padding: 12, borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255,255,255,0.7)', display: 'flex', flexDirection: 'column', gap: 6, boxShadow: 'inset 0 1px 0 rgba(255,255,255,1)' }}>
-                                        <div style={{ fontSize: 11, color: 'var(--color-text-tertiary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tools</div>
+                                        <div style={{ fontSize: 11, color: 'var(--color-text-tertiary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('team_tools_label')}</div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                             <span style={{ fontSize: 22, fontWeight: 900, color: 'var(--color-primary)' }}>{stats.subsCount}</span>
                                             {stats.subsCount > 0 && (
@@ -171,7 +171,7 @@ export default function TeamClient({ members, subscriptions, currentProfile, org
 
                                     {/* Monthly Impact inner glass */}
                                     <div style={{ flex: 1, background: 'rgba(255,255,255,0.5)', padding: 12, borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255,255,255,0.7)', display: 'flex', flexDirection: 'column', gap: 6, boxShadow: 'inset 0 1px 0 rgba(255,255,255,1)' }}>
-                                        <div style={{ fontSize: 11, color: 'var(--color-text-tertiary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Spend</div>
+                                        <div style={{ fontSize: 11, color: 'var(--color-text-tertiary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('team_spend_label')}</div>
                                         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                                             <span style={{ fontSize: 22, fontWeight: 900, color: 'var(--color-primary)' }}>${stats.totalMonthly.toFixed(0)}</span>
                                             <span style={{ fontSize: 11, color: 'var(--color-green)', fontWeight: 700, display: 'flex', alignItems: 'center', background: 'var(--color-green-bg)', padding: '2px 6px', borderRadius: 4 }}>
@@ -197,8 +197,8 @@ export default function TeamClient({ members, subscriptions, currentProfile, org
                                 <Users size={24} />
                             </div>
                             <div style={{ textAlign: 'center' }}>
-                                <div style={{ fontWeight: 700, fontSize: 15 }}>Add Team Member</div>
-                                <div style={{ fontSize: 12, color: 'var(--color-text-tertiary)', marginTop: 4 }}>Invite a new user to your workspace</div>
+                                <div style={{ fontWeight: 700, fontSize: 15 }}>{t('team_add_member_card')}</div>
+                                <div style={{ fontSize: 12, color: 'var(--color-text-tertiary)', marginTop: 4 }}>{t('team_add_member_desc')}</div>
                             </div>
                         </div>
                     )}

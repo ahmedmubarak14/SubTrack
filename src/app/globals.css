@@ -1301,6 +1301,32 @@ p {
   right: 12px;
 }
 
+/* Auth Layout RTL Specifics */
+[dir="rtl"] .authLeft::before {
+  left: auto !important;
+  right: -100px !important;
+}
+
+[dir="rtl"] .authLeft::after {
+  right: auto !important;
+  left: -80px !important;
+}
+
+[dir="rtl"] .inputIcon {
+  left: auto !important;
+  right: 12px !important;
+}
+
+[dir="rtl"] .inputWithIcon .form-input {
+  padding-left: 14px !important;
+  padding-right: 38px !important;
+}
+
+[dir="rtl"] .passwordToggle {
+  right: auto !important;
+  left: 12px !important;
+}
+
 /* Sidebar user footer logout icon — push to left in RTL */
 [dir="rtl"] .sidebar-user svg:last-child {
   margin-left: 0;

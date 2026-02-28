@@ -72,7 +72,7 @@ export default function SettingsClient({ profile, orgName, orgId }: Props) {
             return;
         }
         if (newPw.length < 6) {
-            setPwError('Password must be at least 6 characters');
+            setPwError(t('settings_pw_min_error'));
             return;
         }
         setPwSaving(true);

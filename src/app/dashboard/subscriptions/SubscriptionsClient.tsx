@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { format, differenceInDays, parseISO } from 'date-fns';
-import { Search, Plus, Users, ChevronUp, ChevronDown, Edit2, Trash2, Download } from 'lucide-react';
+import { Search, Plus, Users, ChevronUp, ChevronDown, Edit2, Trash2, Download, Shield, AlertCircle, TrendingUp, ArrowUpRight, Check } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -169,17 +169,17 @@ export default function SubscriptionsClient({ subscriptions: initialSubs, teamMe
                 <div className="filter-bar">
                     <div className="search-input-wrapper">
                         <Search size={15} />
-                        <input className="form-input" placeholder="Search subscriptions…" value={search} onChange={e => setSearch(e.target.value)} />
+                        <input className="form-input" placeholder={t('subs_search_ph')} value={search} onChange={e => setSearch(e.target.value)} />
                     </div>
                     <select className="form-select" style={{ width: 'auto' }} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-                        <option value="all">All statuses</option>
-                        <option value="active">Active</option>
-                        <option value="expiring">Expiring</option>
-                        <option value="trial">Trial</option>
-                        <option value="cancelled">Cancelled</option>
+                        <option value="all">{t('subs_status_all')}</option>
+                        <option value="active">{t('subs_status_active')}</option>
+                        <option value="expiring">{t('subs_status_expiring')}</option>
+                        <option value="trial">{t('subs_status_trial')}</option>
+                        <option value="cancelled">{t('subs_status_cancelled')}</option>
                     </select>
                     <select className="form-select" style={{ width: 'auto' }} value={catFilter} onChange={e => setCatFilter(e.target.value)}>
-                        {categories.map(c => <option key={c} value={c}>{c === 'all' ? 'All categories' : c}</option>)}
+                        {categories.map(c => <option key={c} value={c}>{c === 'all' ? t('subs_cat_all') : c}</option>)}
                     </select>
                 </div>
 
@@ -189,21 +189,21 @@ export default function SubscriptionsClient({ subscriptions: initialSubs, teamMe
                         <thead>
                             <tr>
                                 <th style={{ cursor: 'pointer' }} onClick={() => toggleSort('name')}>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>App / Service <SortIcon k="name" /></span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>{t('dash_col_app')} <SortIcon k="name" /></span>
                                 </th>
                                 <th style={{ cursor: 'pointer' }} onClick={() => toggleSort('seats')}>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Users size={12} /> Users <SortIcon k="seats" /></span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Users size={12} /> {t('subs_col_users')} <SortIcon k="seats" /></span>
                                 </th>
                                 <th style={{ cursor: 'pointer' }} onClick={() => toggleSort('cost')}>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>Cost <SortIcon k="cost" /></span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>{t('dash_col_cost')} <SortIcon k="cost" /></span>
                                 </th>
-                                <th>Billing</th>
-                                <th>Owner</th>
+                                <th>{t('dash_col_billing')}</th>
+                                <th>{t('subs_col_owner')}</th>
                                 <th style={{ cursor: 'pointer' }} onClick={() => toggleSort('renewal_date')}>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>Renewal <SortIcon k="renewal_date" /></span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>{t('dash_col_renewal')} <SortIcon k="renewal_date" /></span>
                                 </th>
                                 <th style={{ cursor: 'pointer' }} onClick={() => toggleSort('status')}>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>Status <SortIcon k="status" /></span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>{t('dash_col_status')} <SortIcon k="status" /></span>
                                 </th>
                                 <th></th>
                             </tr>
@@ -214,10 +214,10 @@ export default function SubscriptionsClient({ subscriptions: initialSubs, teamMe
                                     <td colSpan={8}>
                                         <div className="empty-state">
                                             <div className="empty-state-icon"><Plus size={28} /></div>
-                                            <h3>No subscriptions yet</h3>
-                                            <p>Add your first subscription to start tracking.</p>
+                                            <h3>{t('subs_empty_title')}</h3>
+                                            <p>{t('subs_empty_sub')}</p>
                                             <button className="btn btn-primary" onClick={() => setShowAdd(true)}>
-                                                <Plus size={14} /> Add Subscription
+                                                <Plus size={14} /> {t('dash_add_subscription')}
                                             </button>
                                         </div>
                                     </td>
