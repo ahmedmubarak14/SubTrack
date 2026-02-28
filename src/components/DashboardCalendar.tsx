@@ -62,6 +62,7 @@ export default function DashboardCalendar({ subscriptions }: Props) {
         });
         return map;
     }, [subscriptions]);
+    const displayDayKeys = lang === 'ar' ? [...DAY_KEYS].reverse() : DAY_KEYS;
 
     return (
         <div className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -76,15 +77,15 @@ export default function DashboardCalendar({ subscriptions }: Props) {
                 </div>
             </div>
 
-            <div className="calendar-grid" style={{ marginBottom: 2, display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
-                {DAY_KEYS.map(key => (
+            <div className="calendar-grid" style={{ marginBottom: 2, display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, direction: lang === 'ar' ? 'rtl' : 'ltr' }}>
+                {displayDayKeys.map(key => (
                     <div key={key} style={{ fontSize: '10px', fontWeight: 700, color: 'var(--color-text-tertiary)', textAlign: 'center', textTransform: 'uppercase', padding: '4px 0' }}>
                         {t(key)}
                     </div>
                 ))}
             </div>
 
-            <div className="calendar-grid" style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, gridAutoRows: 'minmax(60px, auto)' }}>
+            <div className="calendar-grid" style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, gridAutoRows: 'minmax(60px, auto)', direction: lang === 'ar' ? 'rtl' : 'ltr' }}>
                 {/* Padding */}
                 {Array.from({ length: startPadding }).map((_, i) => (
                     <div key={`pad-${i}`} style={{ background: 'rgba(0,0,0,0.02)', borderRadius: '4px' }} />
@@ -127,7 +128,6 @@ export default function DashboardCalendar({ subscriptions }: Props) {
                                     >
                                         <img src={computedLogoUrl} alt={sub.name} style={{ width: 16, height: 16, borderRadius: 3, objectFit: 'contain' }}
                                             onError={(e) => {
-                                                // If even the fallback fails, replace the image node with the initials div
                                                 const target = e.currentTarget;
                                                 const parent = target.parentElement;
                                                 if (parent) {

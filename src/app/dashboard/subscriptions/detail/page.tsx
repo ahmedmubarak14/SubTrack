@@ -114,7 +114,7 @@ function SubscriptionDetail() {
     };
 
     return (
-        <div>
+        <div className="page-content">
             <Topbar
                 title={sub.name}
                 onToggleNotifications={openPanel}
@@ -130,7 +130,7 @@ function SubscriptionDetail() {
                 </Link>
             </Topbar>
 
-            <div className="page-content" style={{ maxWidth: 700 }}>
+            <div style={{ maxWidth: 700 }}>
                 <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 'var(--space-5)' }}>
                     {sub.logo_url ? (
                         <img src={sub.logo_url} alt={sub.name} width={64} height={64} style={{ borderRadius: 14, objectFit: 'contain', border: '1px solid var(--color-border)' }} />

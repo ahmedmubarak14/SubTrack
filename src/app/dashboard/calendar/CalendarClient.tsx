@@ -61,22 +61,25 @@ export default function CalendarClient({ subscriptions }: { subscriptions: Sub[]
         return map;
     }, [subscriptions]);
 
-    const DAYS = [
-        t('cal_day_sun'), t('cal_day_mon'), t('cal_day_tue'), t('cal_day_wed'),
-        t('cal_day_thu'), t('cal_day_fri'), t('cal_day_sat')
+    const DAY_KEYS = [
+        'cal_day_sun', 'cal_day_mon', 'cal_day_tue', 'cal_day_wed',
+        'cal_day_thu', 'cal_day_fri', 'cal_day_sat'
     ];
+    const displayDayKeys = lang === 'ar' ? [...DAY_KEYS].reverse() : DAY_KEYS;
 
     return (
         <div>
             <Topbar title={t('cal_title')} onToggleNotifications={openPanel}>
-                <button className="btn btn-secondary btn-sm" onClick={prevMonth}>{/* Note: Arrow Left */}<span style={{ fontSize: 14 }}>{lang === 'ar' ? '→' : '←'}</span></button>
-                <span style={{ fontSize: '14px', fontWeight: 700, minWidth: 130, textAlign: 'center' }}>
-                    {format(currentDate, 'MMMM yyyy', { locale: lang === 'ar' ? ar : undefined })}
-                </span>
-                <button className="btn btn-secondary btn-sm" onClick={nextMonth}>{/* Note: Arrow Right */}<span style={{ fontSize: 14 }}>{lang === 'ar' ? '←' : '→'}</span></button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                    <button className="btn btn-secondary" onClick={prevMonth} style={{ padding: '6px 12px' }}>{lang === 'ar' ? '→' : '←'}</button>
+                    <span style={{ fontSize: '15px', fontWeight: 700, minWidth: 140, textAlign: 'center' }}>
+                        {format(currentDate, 'MMMM yyyy', { locale: lang === 'ar' ? ar : undefined })}
+                    </span>
+                    <button className="btn btn-secondary" onClick={nextMonth} style={{ padding: '6px 12px' }}>{lang === 'ar' ? '←' : '→'}</button>
+                </div>
             </Topbar>
 
-            <div className="page-content">
+            <div className="page-content" style={{ display: 'flex', gap: 'var(--space-6)', alignItems: 'flex-start', position: 'relative' }}>
                 {/* Legend */}
                 <div style={{ display: 'flex', gap: 'var(--space-3)', marginBottom: 'var(--space-6)', flexWrap: 'wrap' }}>
                     {Object.entries(STATUS_COLORS).map(([status, color]) => (
@@ -87,13 +90,15 @@ export default function CalendarClient({ subscriptions }: { subscriptions: Sub[]
                     ))}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 300px' : '1fr', gap: 'var(--space-5)', alignItems: 'start' }}>
-                    {/* Calendar */}
+                {/* Calendar */}
+                <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="card" style={{ padding: 'var(--space-4)' }}>
                         {/* Day headers */}
-                        <div className="calendar-grid" style={{ marginBottom: 2 }}>
-                            {DAYS.map(d => (
-                                <div key={d} className="calendar-day-header">{d}</div>
+                        <div className="calendar-grid" style={{ marginBottom: 'var(--space-2)', display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 8, direction: lang === 'ar' ? 'rtl' : 'ltr' }}>
+                            {displayDayKeys.map(key => (
+                                <div key={key} style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-tertiary)', textAlign: 'center' }}>
+                                    {t(key)}
+                                </div>
                             ))}
                         </div>
                         {/* Day cells */}
@@ -160,10 +165,28 @@ export default function CalendarClient({ subscriptions }: { subscriptions: Sub[]
 
                     {/* Sidebar detail */}
                     {selected && (
-                        <div className="card" style={{ position: 'sticky', top: 80 }}>
+                        <div className="card" style={{
+                            position: 'absolute',
+                            top: 0,
+                            [lang === 'ar' ? 'left' : 'right']: 0,
+                            width: 320,
+                            height: '100%',
+                            zIndex: 20,
+                            boxShadow: lang === 'ar' ? '4px 0 24px rgba(0,0,0,0.05)' : '-4px 0 24px rgba(0,0,0,0.05)',
+                            direction: lang === 'ar' ? 'rtl' : 'ltr'
+                        }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-4)' }}>
-                                <h3 style={{ fontSize: '16px' }}>{selected.name}</h3>
-                                <button className="btn btn-ghost btn-sm" onClick={() => setSelected(null)}>✕</button>
+                                {lang === 'ar' ? (
+                                    <>
+                                        <button className="btn btn-ghost btn-sm" onClick={() => setSelected(null)}>✕</button>
+                                        <h3 style={{ fontSize: '18px', textAlign: 'left' }}>{selected.name}</h3>
+                                    </>
+                                ) : (
+                                    <>
+                                        <h3 style={{ fontSize: '18px' }}>{selected.name}</h3>
+                                        <button className="btn btn-ghost btn-sm" onClick={() => setSelected(null)}>✕</button>
+                                    </>
+                                )}
                             </div>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
